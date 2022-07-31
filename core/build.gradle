@@ -1,3 +1,13 @@
 plugins {
     id 'code-generator.java'
 }
+
+dependencies {
+    compileOnly libs.lombok
+    annotationProcessor libs.lombok
+
+    testCompileOnly libs.lombok
+    testAnnotationProcessor libs.lombok
+
+    testImplementation libs.bundles.junit
+}
