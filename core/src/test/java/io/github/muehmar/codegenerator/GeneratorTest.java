@@ -1,5 +1,6 @@
 package io.github.muehmar.codegenerator;
 
+import static io.github.muehmar.codegenerator.Generator.constant;
 import static io.github.muehmar.codegenerator.Generator.ofWriterFunction;
 import static io.github.muehmar.codegenerator.TestData.booleanData;
 import static io.github.muehmar.codegenerator.TestData.noData;
@@ -17,8 +18,8 @@ class GeneratorTest {
 
   @Test
   void appendGenerator_when_called_then_generatedCorrectAppended() {
-    final Generator<Void, Void> genA = ofWriterFunction(w -> w.println("genA"));
-    final Generator<Void, Void> genB = ofWriterFunction(w -> w.println("genB"));
+    final Generator<Void, Void> genA = constant("genA");
+    final Generator<Void, Void> genB = constant("genB");
 
     final Generator<Void, Void> gen = genA.append(genB);
     final Writer writer = gen.generate(noData(), noSettings(), Writer.createDefault());
@@ -27,8 +28,8 @@ class GeneratorTest {
 
   @Test
   void appendGeneratorWithTabs_when_called_then_generatedCorrectAppendedWithIndention() {
-    final Generator<Void, Void> genA = ofWriterFunction(w -> w.println("genA"));
-    final Generator<Void, Void> genB = ofWriterFunction(w -> w.println("genB"));
+    final Generator<Void, Void> genA = constant("genA");
+    final Generator<Void, Void> genB = constant("genB");
 
     final Generator<Void, Void> gen = genA.append(genB, 2);
     final Writer writer = gen.generate(noData(), noSettings(), Writer.createDefault());
@@ -37,7 +38,7 @@ class GeneratorTest {
 
   @Test
   void appendUnaryOperator_when_called_then_generatedCorrectAppend() {
-    final Generator<Void, Void> genA = ofWriterFunction(w -> w.println("genA"));
+    final Generator<Void, Void> genA = constant("genA");
 
     final Generator<Void, Void> gen = genA.append(w -> w.println("appended"));
     final Writer writer = gen.generate(noData(), noSettings(), Writer.createDefault());
@@ -46,7 +47,7 @@ class GeneratorTest {
 
   @Test
   void appendList_when_called_then_contentCreatedForEveryElementInTheList() {
-    final Generator<ListData<StringData>, Void> genA = ofWriterFunction(w -> w.println("genA"));
+    final Generator<ListData<StringData>, Void> genA = constant("genA");
     final Generator<StringData, Void> fieldGen =
         (field, settings, writer) -> writer.println("%s", field.getText());
 
@@ -61,7 +62,7 @@ class GeneratorTest {
 
   @Test
   void appendList_when_calledWithSeparator_then_separatorAddedBetween() {
-    final Generator<ListData<StringData>, Void> genA = ofWriterFunction(w -> w.println("genA"));
+    final Generator<ListData<StringData>, Void> genA = constant("genA");
     final Generator<StringData, Void> fieldGen =
         (field, settings, writer) -> writer.println("%s", field.getText());
 
@@ -76,7 +77,7 @@ class GeneratorTest {
 
   @Test
   void appendList_when_emptyList_then_initialGenExecuted() {
-    final Generator<ListData<StringData>, Void> genA = ofWriterFunction(w -> w.println("genA"));
+    final Generator<ListData<StringData>, Void> genA = constant("genA");
     final Generator<StringData, Void> fieldGen =
         (field, settings, writer) -> writer.println("%s", field.getText());
 
@@ -91,8 +92,8 @@ class GeneratorTest {
 
   @Test
   void appendConditionally_when_conditionEvaluatedToTrue_then_generatorAppended() {
-    final Generator<BooleanData, Void> genA = ofWriterFunction(w -> w.println("genA"));
-    final Generator<BooleanData, Void> genB = ofWriterFunction(w -> w.println("genB"));
+    final Generator<BooleanData, Void> genA = constant("genA");
+    final Generator<BooleanData, Void> genB = constant("genB");
 
     final Generator<BooleanData, Void> generator =
         genA.appendConditionally(BooleanData::isFlag, genB);
@@ -104,8 +105,8 @@ class GeneratorTest {
 
   @Test
   void appendConditionally_when_conditionEvaluatedToFalse_then_generatorNotAppended() {
-    final Generator<BooleanData, Void> genA = ofWriterFunction(w -> w.println("genA"));
-    final Generator<BooleanData, Void> genB = ofWriterFunction(w -> w.println("genB"));
+    final Generator<BooleanData, Void> genA = constant("genA");
+    final Generator<BooleanData, Void> genB = constant("genB");
 
     final Generator<BooleanData, Void> generator =
         genA.appendConditionally(BooleanData::isFlag, genB);
@@ -117,7 +118,7 @@ class GeneratorTest {
 
   @Test
   void filter_when_conditionIsTrue_then_generatorUnchanged() {
-    final Generator<Integer, Integer> genA = ofWriterFunction(w -> w.println("genA"));
+    final Generator<Integer, Integer> genA = constant("genA");
 
     final Generator<Integer, Integer> generator = genA.filter((i1, i2) -> i1 + i2 == 3);
 
@@ -128,7 +129,7 @@ class GeneratorTest {
 
   @Test
   void filter_when_conditionIsFalse_then_emptyGeneratorReturned() {
-    final Generator<Integer, Integer> genA = ofWriterFunction(w -> w.println("genA"));
+    final Generator<Integer, Integer> genA = constant("genA");
 
     final Generator<Integer, Integer> generator = genA.filter((i1, i2) -> i1 + i2 == 3);
 
@@ -139,7 +140,7 @@ class GeneratorTest {
 
   @Test
   void appendNewLine_when_called_then_outputHasNewLineAppended() {
-    final Generator<Void, Void> genA = ofWriterFunction(w -> w.println("genA"));
+    final Generator<Void, Void> genA = constant("genA");
 
     final Writer writer =
         genA.appendNewLine().generate(noData(), noSettings(), Writer.createDefault());
@@ -149,7 +150,7 @@ class GeneratorTest {
 
   @Test
   void prependNewLine_when_called_then_outputHasNewLinePrepended() {
-    final Generator<Void, Void> genA = ofWriterFunction(w -> w.println("genA"));
+    final Generator<Void, Void> genA = constant("genA");
 
     final Writer writer =
         genA.prependNewLine().generate(noData(), noSettings(), Writer.createDefault());

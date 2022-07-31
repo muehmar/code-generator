@@ -14,6 +14,10 @@ public interface Generator<A, B> {
     return gen;
   }
 
+  static <A, B> Generator<A, B> constant(String constant) {
+    return (data, settings, writer) -> writer.println(constant);
+  }
+
   static <A, B> Generator<A, B> ofWriterFunction(UnaryOperator<Writer> f) {
     return (data, settings, writer) -> f.apply(writer);
   }
