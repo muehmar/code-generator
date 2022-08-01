@@ -21,7 +21,7 @@ public class MethodGen<A, B> implements Generator<A, B> {
   private final BiFunction<A, B, PList<String>> createArguments;
   private final Optional<Generator<A, B>> contentGenerator;
 
-  public MethodGen(
+  MethodGen(
       BiFunction<A, B, JavaModifiers> createModifiers,
       BiFunction<A, B, PList<String>> createGenericTypeParameters,
       BiFunction<A, B, String> createReturnType,
