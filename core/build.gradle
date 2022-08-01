@@ -7,6 +7,9 @@ dependencies {
     compileOnly libs.lombok
     annotationProcessor libs.lombok
 
+    compileOnly libs.pojoExtension.annotations
+    annotationProcessor libs.pojoExtension
+
     testCompileOnly libs.lombok
     testAnnotationProcessor libs.lombok
 

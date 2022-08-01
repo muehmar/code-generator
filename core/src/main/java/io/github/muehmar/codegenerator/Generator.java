@@ -26,6 +26,10 @@ public interface Generator<A, B> {
     return (data, settings, writer) -> writer;
   }
 
+  static <A, B> Generator<A, B> newLine() {
+    return (data, settings, writer) -> writer.println();
+  }
+
   default Generator<A, B> appendNewLine() {
     return append((UnaryOperator<Writer>) Writer::println);
   }
