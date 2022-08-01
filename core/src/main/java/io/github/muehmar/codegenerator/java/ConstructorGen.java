@@ -42,7 +42,7 @@ public class ConstructorGen<A, B> implements Generator<A, B> {
         .generate(data, settings, writer);
   }
 
-  @FieldBuilder(fieldName = "createModifiers")
+  @FieldBuilder(fieldName = "createModifiers", disableDefaultMethods = true)
   static class ModifiersGen {
     private ModifiersGen() {}
 
@@ -57,9 +57,13 @@ public class ConstructorGen<A, B> implements Generator<A, B> {
     static <A, B> BiFunction<A, B, JavaModifiers> modifiers(JavaModifier m1, JavaModifier m2) {
       return (d, s) -> JavaModifiers.of(m1, m2);
     }
+
+    static <A, B> BiFunction<A, B, JavaModifiers> modifiers(JavaModifiers javaModifiers) {
+      return (d, s) -> javaModifiers;
+    }
   }
 
-  @FieldBuilder(fieldName = "createClassName")
+  @FieldBuilder(fieldName = "createClassName", disableDefaultMethods = true)
   static class ClassNameBuilder {
     private ClassNameBuilder() {}
 
@@ -76,7 +80,7 @@ public class ConstructorGen<A, B> implements Generator<A, B> {
     }
   }
 
-  @FieldBuilder(fieldName = "createArguments")
+  @FieldBuilder(fieldName = "createArguments", disableDefaultMethods = true)
   static class ArgumentsBuilder {
     private ArgumentsBuilder() {}
 
@@ -104,7 +108,7 @@ public class ConstructorGen<A, B> implements Generator<A, B> {
     }
   }
 
-  @FieldBuilder(fieldName = "contentGenerator")
+  @FieldBuilder(fieldName = "contentGenerator", disableDefaultMethods = true)
   static class ContentBuilder {
     private ContentBuilder() {}
 

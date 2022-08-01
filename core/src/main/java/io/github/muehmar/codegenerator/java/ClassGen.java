@@ -90,7 +90,7 @@ public class ClassGen<A, B> implements Generator<A, B> {
     return writer.println("}");
   }
 
-  @FieldBuilder(fieldName = "type")
+  @FieldBuilder(fieldName = "type", disableDefaultMethods = true)
   static class TypeBuilder {
     private TypeBuilder() {}
 
@@ -103,7 +103,7 @@ public class ClassGen<A, B> implements Generator<A, B> {
     }
   }
 
-  @FieldBuilder(fieldName = "declaration")
+  @FieldBuilder(fieldName = "declaration", disableDefaultMethods = true)
   static class DeclarationBuilder1 {
     private DeclarationBuilder1() {}
 
@@ -146,7 +146,7 @@ public class ClassGen<A, B> implements Generator<A, B> {
     }
   }
 
-  @FieldBuilder(fieldName = "createClassName")
+  @FieldBuilder(fieldName = "createClassName", disableDefaultMethods = true)
   static class ClassNameBuilder {
     private ClassNameBuilder() {}
 

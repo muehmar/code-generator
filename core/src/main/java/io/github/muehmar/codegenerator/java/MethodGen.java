@@ -62,7 +62,7 @@ public class MethodGen<A, B> implements Generator<A, B> {
         .generate(data, settings, writer);
   }
 
-  @FieldBuilder(fieldName = "createModifiers")
+  @FieldBuilder(fieldName = "createModifiers", disableDefaultMethods = true)
   static class ModifiersGen {
     private ModifiersGen() {}
 
@@ -77,9 +77,13 @@ public class MethodGen<A, B> implements Generator<A, B> {
     static <A, B> BiFunction<A, B, JavaModifiers> modifiers(JavaModifier m1, JavaModifier m2) {
       return (d, s) -> JavaModifiers.of(m1, m2);
     }
+
+    static <A, B> BiFunction<A, B, JavaModifiers> modifiers(JavaModifiers javaModifiers) {
+      return (d, s) -> javaModifiers;
+    }
   }
 
-  @FieldBuilder(fieldName = "createGenericTypeParameters")
+  @FieldBuilder(fieldName = "createGenericTypeParameters", disableDefaultMethods = true)
   static class GenericTypeParametersBuilder {
     private GenericTypeParametersBuilder() {}
 
@@ -104,7 +108,7 @@ public class MethodGen<A, B> implements Generator<A, B> {
     }
   }
 
-  @FieldBuilder(fieldName = "createReturnType")
+  @FieldBuilder(fieldName = "createReturnType", disableDefaultMethods = true)
   static class ReturnTypeBuilder {
     private ReturnTypeBuilder() {}
 
@@ -121,7 +125,7 @@ public class MethodGen<A, B> implements Generator<A, B> {
     }
   }
 
-  @FieldBuilder(fieldName = "createMethodName")
+  @FieldBuilder(fieldName = "createMethodName", disableDefaultMethods = true)
   static class MethodNameBuilder {
     private MethodNameBuilder() {}
 
@@ -138,7 +142,7 @@ public class MethodGen<A, B> implements Generator<A, B> {
     }
   }
 
-  @FieldBuilder(fieldName = "createArguments")
+  @FieldBuilder(fieldName = "createArguments", disableDefaultMethods = true)
   static class ArgumentsBuilder {
     private ArgumentsBuilder() {}
 
@@ -157,7 +161,7 @@ public class MethodGen<A, B> implements Generator<A, B> {
     }
   }
 
-  @FieldBuilder(fieldName = "contentGenerator")
+  @FieldBuilder(fieldName = "contentGenerator", disableDefaultMethods = true)
   static class ContentBuilder {
     private ContentBuilder() {}
 
