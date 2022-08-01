@@ -67,7 +67,7 @@ public class MethodGen<A, B> implements Generator<A, B> {
     private ModifiersGen() {}
 
     static <A, B> BiFunction<A, B, JavaModifiers> modifiers() {
-      return (d, s) -> JavaModifiers.of();
+      return (d, s) -> JavaModifiers.empty();
     }
 
     static <A, B> BiFunction<A, B, JavaModifiers> modifiers(JavaModifier modifier) {
@@ -80,6 +80,15 @@ public class MethodGen<A, B> implements Generator<A, B> {
 
     static <A, B> BiFunction<A, B, JavaModifiers> modifiers(JavaModifiers javaModifiers) {
       return (d, s) -> javaModifiers;
+    }
+
+    static <A, B> BiFunction<A, B, JavaModifiers> modifiers(
+        BiFunction<A, B, JavaModifiers> modifiers) {
+      return modifiers;
+    }
+
+    static <A, B> BiFunction<A, B, JavaModifiers> modifiers(Function<A, JavaModifiers> modifiers) {
+      return (d, s) -> modifiers.apply(d);
     }
   }
 
