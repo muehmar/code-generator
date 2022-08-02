@@ -8,69 +8,124 @@ import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
 public interface Generator<A, B> {
+  /**
+   * Appends content to the given {@link Writer} for the data {@link A} and the settings {@link B}
+   * by returning a new immutable instance of {@link Writer} containing the new content.
+   */
   Writer generate(A data, B settings, Writer writer);
 
   static <A, B> Generator<A, B> of(Generator<A, B> gen) {
     return gen;
   }
 
+  /** Creates a new {@link Generator} producing the given constant. */
   static <A, B> Generator<A, B> constant(String constant) {
     return (data, settings, writer) -> writer.println(constant);
   }
 
+  /** Creates a new {@link Generator} by applying the given function on the {@link Writer}. */
   static <A, B> Generator<A, B> ofWriterFunction(UnaryOperator<Writer> f) {
     return (data, settings, writer) -> f.apply(writer);
   }
 
+  /** Creates a new {@link Generator} which produces nothing. */
   static <A, B> Generator<A, B> emptyGen() {
     return (data, settings, writer) -> writer;
   }
 
+  /** Creates a new {@link Generator} which produces a new line. */
   static <A, B> Generator<A, B> newLine() {
     return (data, settings, writer) -> writer.println();
   }
 
+  /** Returns a new {@link Generator} which appends a new line to {@code this}. */
   default Generator<A, B> appendNewLine() {
     return append((UnaryOperator<Writer>) Writer::println);
   }
 
+  /** Returns a new {@link Generator} which prepends a new line to {@code this}. */
   default Generator<A, B> prependNewLine() {
     return Generator.<A, B>emptyGen().appendNewLine().append(this);
   }
 
+  /**
+   * Returns a new {@link Generator} which will append the content of the given {@link Generator}
+   * {@code next} to the content of {@code this}.
+   */
   default Generator<A, B> append(Generator<A, B> next) {
     final Generator<A, B> self = this;
-    return (data, settings, writer) ->
-        next.generate(data, settings, self.generate(data, settings, writer));
+    return (data, settings, writer) -> {
+      final Writer selfWriter = self.generate(data, settings, writer);
+      return next.generate(data, settings, selfWriter);
+    };
   }
 
+  /**
+   * Returns a new {@link Generator} which will append the content of the given {@link Generator}
+   * {@code next} to the content of {@code this}, where the next generator has no settings.
+   */
   default Generator<A, B> appendNoSettings(Generator<A, Void> next) {
     final Generator<A, B> self = this;
-    return (data, settings, writer) ->
-        next.generate(data, (Void) null, self.generate(data, settings, writer));
+    return (data, settings, writer) -> {
+      final Writer selfWriter = self.generate(data, settings, writer);
+      return next.generate(data, (Void) null, selfWriter);
+    };
   }
 
+  /**
+   * Returns a new {@link Generator} which will append the content of the given {@link Generator}
+   * {@code next} to the content of {@code this} intended with the given number of tabs.
+   */
   default Generator<A, B> append(Generator<A, B> next, int tabs) {
     final Generator<A, B> self = this;
-    return (data, settings, writer) ->
-        self.generate(data, settings, writer)
-            .append(tabs, next.generate(data, settings, writer.empty()));
+    return (data, settings, writer) -> {
+      final Writer selfWriter = self.generate(data, settings, writer);
+      final Writer nextWriter = next.generate(data, settings, writer.empty());
+      return selfWriter.append(tabs, nextWriter);
+    };
   }
 
+  /**
+   * Returns a new {@link Generator} which will append the content produced by the given {@link
+   * Writer} function {@code next} to the content of {@code this}.
+   */
   default Generator<A, B> append(UnaryOperator<Writer> next) {
     return append((data, settings, writer) -> next.apply(writer));
   }
 
+  /**
+   * Returns a new {@link Generator} which will append the content of the given {@link Generator}
+   * {@code next} to the content of {@code this} while transforming the input data with the given
+   * function {@code f} for the next generator.
+   */
   default <C> Generator<A, B> append(Generator<C, B> gen, Function<A, C> f) {
     final Generator<A, B> self = this;
-    return (data, settings, writer) ->
-        gen.generate(f.apply(data), settings, self.generate(data, settings, writer));
+    return (data, settings, writer) -> {
+      final Writer selfWriter = self.generate(data, settings, writer);
+      return gen.generate(f.apply(data), settings, selfWriter);
+    };
   }
 
+  /**
+   * Returns a new {@link Generator} which will append the content of the given {@link Generator}
+   * {@code next} to the content of {@code this}. The next generator is executed for every element
+   * which is returned by the given function {@code f} applied to the input data. The new content is
+   * appended in the order of the elements returned by the function {@code f}.
+   */
   default <C> Generator<A, B> appendList(Generator<C, B> gen, Function<A, Iterable<C>> f) {
     return appendList(gen, f, Generator.emptyGen());
   }
 
+  /**
+   * Returns a new {@link Generator} which will append the content of the given {@link Generator}
+   * {@code next} to the content of {@code this}. The next generator is executed for every element
+   * which is returned by the given function {@code f} applied to the input data.
+   *
+   * <p>Between the content of each element produced by the {@code next} generator, content produced
+   * by the {@code separator} generator.
+   *
+   * <p>The new content is appended in the order of the elements returned by the function {@code f}.
+   */
   default <C> Generator<A, B> appendList(
       Generator<C, B> gen, Function<A, Iterable<C>> f, Generator<A, B> separator) {
     final Generator<A, B> self = this;
@@ -84,6 +139,10 @@ public interface Generator<A, B> {
     };
   }
 
+  /**
+   * Returns a new {@link Generator} which will append the content of the given {@link Generator}
+   * {@code next} to the content of {@code this} only if the given {@link Predicate} holds true;
+   */
   default Generator<A, B> appendConditionally(BiPredicate<A, B> predicate, Generator<A, B> append) {
     final Generator<A, B> self = this;
     return (data, settings, writer) -> {
@@ -94,6 +153,10 @@ public interface Generator<A, B> {
     };
   }
 
+  /**
+   * Returns a new {@link Generator} which will append the content of the given {@link Generator}
+   * {@code next} to the content of {@code this} only if the given {@link Predicate} holds true;
+   */
   default Generator<A, B> appendConditionally(Predicate<A> predicate, Generator<A, B> append) {
     return appendConditionally((data, settings) -> predicate.test(data), append);
   }
