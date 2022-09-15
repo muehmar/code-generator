@@ -17,6 +17,20 @@ import org.junit.jupiter.api.Test;
 class GeneratorTest {
 
   @Test
+  void constant_when_created_then_correctOutput() {
+    final Generator<Void, Void> gen = constant("Hello World!");
+    final Writer writer = gen.generate(noData(), noSettings(), Writer.createDefault());
+    assertEquals("Hello World!", writer.asString());
+  }
+
+  @Test
+  void ofWriterFunction_when_created_then_correctOutput() {
+    final Generator<Void, Void> gen = ofWriterFunction(w -> w.println("Hello World!"));
+    final Writer writer = gen.generate(noData(), noSettings(), Writer.createDefault());
+    assertEquals("Hello World!", writer.asString());
+  }
+
+  @Test
   void appendGenerator_when_called_then_generatedCorrectAppended() {
     final Generator<Void, Void> genA = constant("genA");
     final Generator<Void, Void> genB = constant("genB");
