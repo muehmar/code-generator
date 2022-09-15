@@ -15,7 +15,7 @@ public class ClassGen<A, B> implements Generator<A, B> {
   private final ClassType type;
   private final Declaration declaration;
   private final Generator<A, B> packageGen;
-  private final JavaModifiers modifiers;
+  private final BiFunction<A, B, JavaModifiers> modifiers;
   private final BiFunction<A, B, String> createClassName;
   private final BiFunction<A, B, Optional<String>> superClass;
   private final BiFunction<A, B, PList<String>> interfaces;
@@ -26,7 +26,7 @@ public class ClassGen<A, B> implements Generator<A, B> {
       ClassType type,
       Declaration declaration,
       Generator<A, B> packageGen,
-      JavaModifiers modifiers,
+      BiFunction<A, B, JavaModifiers> modifiers,
       BiFunction<A, B, String> createClassName,
       BiFunction<A, B, Optional<String>> superClass,
       BiFunction<A, B, PList<String>> interfaces,
@@ -79,7 +79,7 @@ public class ClassGen<A, B> implements Generator<A, B> {
             " implements ", interfaces.apply(data, settings).mkString(", "), "");
     return writer.println(
         "%s%s %s%s%s {",
-        modifiers.asStringTrailingWhitespace(),
+        modifiers.apply(data, settings).asStringTrailingWhitespace(),
         type.value,
         createClassName.apply(data, settings),
         superClassStr,
@@ -125,24 +125,30 @@ public class ClassGen<A, B> implements Generator<A, B> {
   static class ModifierBuilder {
     private ModifierBuilder() {}
 
-    static JavaModifiers noModifiers() {
-      return JavaModifiers.empty();
+    static <A, B> BiFunction<A, B, JavaModifiers> noModifiers() {
+      return (data, settings) -> JavaModifiers.empty();
     }
 
-    static JavaModifiers modifiers(JavaModifier m1) {
-      return JavaModifiers.of(m1);
+    static <A, B> BiFunction<A, B, JavaModifiers> modifiers(JavaModifier m1) {
+      return (data, settings) -> JavaModifiers.of(m1);
     }
 
-    static JavaModifiers modifiers(JavaModifier m1, JavaModifier m2) {
-      return JavaModifiers.of(m1, m2);
+    static <A, B> BiFunction<A, B, JavaModifiers> modifierList(
+        BiFunction<A, B, PList<JavaModifier>> f) {
+      return (data, settings) -> JavaModifiers.of(f.apply(data, settings));
     }
 
-    static JavaModifiers modifiers(JavaModifier m1, JavaModifier m2, JavaModifier m3) {
-      return JavaModifiers.of(m1, m2, m3);
+    static <A, B> BiFunction<A, B, JavaModifiers> modifiers(JavaModifier m1, JavaModifier m2) {
+      return (data, settings) -> JavaModifiers.of(m1, m2);
     }
 
-    static JavaModifiers modifiers(PList<JavaModifier> modifiers) {
-      return JavaModifiers.of(modifiers);
+    static <A, B> BiFunction<A, B, JavaModifiers> modifiers(
+        JavaModifier m1, JavaModifier m2, JavaModifier m3) {
+      return (data, settings) -> JavaModifiers.of(m1, m2, m3);
+    }
+
+    static <A, B> BiFunction<A, B, JavaModifiers> modifiers(PList<JavaModifier> modifiers) {
+      return (data, settings) -> JavaModifiers.of(modifiers);
     }
   }
 
