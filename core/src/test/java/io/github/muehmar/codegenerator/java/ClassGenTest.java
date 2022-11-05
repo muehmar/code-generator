@@ -73,6 +73,58 @@ class ClassGenTest {
   }
 
   @Test
+  void generate_when_enum_then_correctOutput() {
+    final ClassGen<StringData, Void> generator =
+        ClassGenBuilder.<StringData, Void>create()
+            .enum_()
+            .topLevel()
+            .packageGen(PACKAGE_GEN)
+            .modifiers(JavaModifier.PUBLIC)
+            .className((data, s) -> data.getText())
+            .noSuperClass()
+            .noInterfaces()
+            .content(Generator.ofWriterFunction(w -> w.println("Content")))
+            .build();
+
+    final Writer writer =
+        generator.generate(new StringData("HelloWorld"), noSettings(), Writer.createDefault());
+    assertEquals(
+        "package io.github.muehmar;\n"
+            + "\n"
+            + "\n"
+            + "public enum HelloWorld {\n"
+            + "  Content\n"
+            + "}",
+        writer.asString());
+  }
+
+  @Test
+  void generate_when_interfaceInheritsInterface_then_correctInheritance() {
+    final ClassGen<StringData, Void> generator =
+        ClassGenBuilder.<StringData, Void>create()
+            .ifc()
+            .topLevel()
+            .packageGen(PACKAGE_GEN)
+            .modifiers(JavaModifier.PUBLIC)
+            .className((data, s) -> data.getText())
+            .noSuperClass()
+            .singleInterface((data, settings) -> "World")
+            .content(Generator.ofWriterFunction(w -> w.println("Content")))
+            .build();
+
+    final Writer writer =
+        generator.generate(new StringData("HelloWorld"), noSettings(), Writer.createDefault());
+    assertEquals(
+        "package io.github.muehmar;\n"
+            + "\n"
+            + "\n"
+            + "public interface HelloWorld extends World {\n"
+            + "  Content\n"
+            + "}",
+        writer.asString());
+  }
+
+  @Test
   void generate_when_refAddedInContent_then_refPrinted() {
     final ClassGen<StringData, Void> generator =
         ClassGenBuilder.<StringData, Void>create()

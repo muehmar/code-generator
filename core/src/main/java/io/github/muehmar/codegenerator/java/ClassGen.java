@@ -74,9 +74,13 @@ public class ClassGen<A, B> implements Generator<A, B> {
   private Writer classStart(A data, B settings, Writer writer) {
     final String superClassStr =
         Strings.surroundIfNotEmpty(" extends ", superClass.apply(data, settings).orElse(""), "");
+
+    final String interfaceInheritance = type.equals(ClassType.INTERFACE) ? "extends" : "implements";
+
     final String interfacesStr =
         Strings.surroundIfNotEmpty(
-            " implements ", interfaces.apply(data, settings).mkString(", "), "");
+            " " + interfaceInheritance + " ", interfaces.apply(data, settings).mkString(", "), "");
+
     return writer.println(
         "%s%s %s%s%s {",
         modifiers.apply(data, settings).asStringTrailingWhitespace(),
@@ -100,6 +104,10 @@ public class ClassGen<A, B> implements Generator<A, B> {
 
     static ClassType clazz() {
       return ClassType.CLASS;
+    }
+
+    static ClassType enum_() {
+      return ClassType.ENUM;
     }
   }
 
@@ -221,7 +229,8 @@ public class ClassGen<A, B> implements Generator<A, B> {
 
   public enum ClassType {
     CLASS("class"),
-    INTERFACE("interface");
+    INTERFACE("interface"),
+    ENUM("enum");
 
     private final String value;
 
