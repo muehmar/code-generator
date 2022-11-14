@@ -27,6 +27,7 @@ class ClassGenTest {
             .clazz()
             .topLevel()
             .packageGen(PACKAGE_GEN)
+            .noJavaDoc()
             .modifiers(JavaModifier.PUBLIC)
             .className((data, s) -> data.getText())
             .noSuperClass()
@@ -47,12 +48,41 @@ class ClassGenTest {
   }
 
   @Test
+  void generate_when_javaDoc_then_correctGeneratedString() {
+    final ClassGen<StringData, Void> generator =
+        ClassGenBuilder.<StringData, Void>create()
+            .clazz()
+            .topLevel()
+            .packageGen(PACKAGE_GEN)
+            .javaDoc((data, settings) -> String.format("/** %s */", data.getText()))
+            .modifiers(JavaModifier.PUBLIC)
+            .className((data, s) -> data.getText())
+            .noSuperClass()
+            .noInterfaces()
+            .content(Generator.constant("Content"))
+            .build();
+
+    final Writer writer =
+        generator.generate(new StringData("HelloWorld"), noSettings(), Writer.createDefault());
+    assertEquals(
+        "package io.github.muehmar;\n"
+            + "\n"
+            + "\n"
+            + "/** HelloWorld */\n"
+            + "public class HelloWorld {\n"
+            + "  Content\n"
+            + "}",
+        writer.asString());
+  }
+
+  @Test
   void generate_when_interface_then_correctOutput() {
     final ClassGen<StringData, Void> generator =
         ClassGenBuilder.<StringData, Void>create()
             .ifc()
             .topLevel()
             .packageGen(PACKAGE_GEN)
+            .noJavaDoc()
             .modifiers(JavaModifier.PUBLIC)
             .className((data, s) -> data.getText())
             .noSuperClass()
@@ -79,6 +109,7 @@ class ClassGenTest {
             .enum_()
             .topLevel()
             .packageGen(PACKAGE_GEN)
+            .noJavaDoc()
             .modifiers(JavaModifier.PUBLIC)
             .className((data, s) -> data.getText())
             .noSuperClass()
@@ -105,6 +136,7 @@ class ClassGenTest {
             .ifc()
             .topLevel()
             .packageGen(PACKAGE_GEN)
+            .noJavaDoc()
             .modifiers(JavaModifier.PUBLIC)
             .className((data, s) -> data.getText())
             .noSuperClass()
@@ -131,6 +163,7 @@ class ClassGenTest {
             .clazz()
             .topLevel()
             .packageGen(PACKAGE_GEN)
+            .noJavaDoc()
             .modifiers(JavaModifier.PUBLIC)
             .className((data, s) -> data.getText())
             .noSuperClass()
@@ -157,6 +190,7 @@ class ClassGenTest {
             .clazz()
             .nested()
             .packageGen(Generator.emptyGen())
+            .noJavaDoc()
             .modifiers(JavaModifier.PUBLIC)
             .className((data, s) -> data.getText())
             .noSuperClass()
@@ -178,6 +212,7 @@ class ClassGenTest {
             .clazz()
             .nested()
             .packageGen(PACKAGE_GEN)
+            .noJavaDoc()
             .modifiers(modifiers)
             .className((data, s) -> data.getText())
             .noSuperClass()
@@ -197,6 +232,7 @@ class ClassGenTest {
             .clazz()
             .nested()
             .packageGen(Generator.emptyGen())
+            .noJavaDoc()
             .modifiers(JavaModifier.PUBLIC)
             .className((data, s) -> data.getText())
             .superClass((p, s) -> "Superclass")
@@ -216,6 +252,7 @@ class ClassGenTest {
             .clazz()
             .nested()
             .packageGen(Generator.emptyGen())
+            .noJavaDoc()
             .modifiers(JavaModifier.PUBLIC)
             .className((p, s) -> p.getList().apply(0).getText())
             .superClass((p, s) -> "Superclass")

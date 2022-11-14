@@ -15,6 +15,7 @@ public class ClassGen<A, B> implements Generator<A, B> {
   private final ClassType type;
   private final Declaration declaration;
   private final Generator<A, B> packageGen;
+  private final Generator<A, B> javaDocGen;
   private final BiFunction<A, B, JavaModifiers> modifiers;
   private final BiFunction<A, B, String> createClassName;
   private final BiFunction<A, B, Optional<String>> superClass;
@@ -26,6 +27,7 @@ public class ClassGen<A, B> implements Generator<A, B> {
       ClassType type,
       Declaration declaration,
       Generator<A, B> packageGen,
+      Generator<A, B> javaDocGen,
       BiFunction<A, B, JavaModifiers> modifiers,
       BiFunction<A, B, String> createClassName,
       BiFunction<A, B, Optional<String>> superClass,
@@ -34,6 +36,7 @@ public class ClassGen<A, B> implements Generator<A, B> {
     this.type = type;
     this.declaration = declaration;
     this.packageGen = packageGen;
+    this.javaDocGen = javaDocGen;
     this.modifiers = modifiers;
     this.createClassName = createClassName;
     this.superClass = superClass;
@@ -49,6 +52,7 @@ public class ClassGen<A, B> implements Generator<A, B> {
 
     return packageGen()
         .append(this::refs)
+        .append(javaDocGen)
         .append(this::classStart)
         .append(contentGenerator, 1)
         .append(this::classEnd)
@@ -94,7 +98,7 @@ public class ClassGen<A, B> implements Generator<A, B> {
     return writer.println("}");
   }
 
-  @FieldBuilder(fieldName = "type", disableDefaultMethods = true)
+  @FieldBuilder(fieldName = "type")
   static class TypeBuilder {
     private TypeBuilder() {}
 
@@ -111,7 +115,7 @@ public class ClassGen<A, B> implements Generator<A, B> {
     }
   }
 
-  @FieldBuilder(fieldName = "declaration", disableDefaultMethods = true)
+  @FieldBuilder(fieldName = "declaration")
   static class DeclarationBuilder1 {
     private DeclarationBuilder1() {}
 
@@ -127,6 +131,27 @@ public class ClassGen<A, B> implements Generator<A, B> {
   @FieldBuilder(fieldName = "packageGen")
   static class PackageBuilder {
     private PackageBuilder() {}
+  }
+
+  @FieldBuilder(fieldName = "javaDocGen", disableDefaultMethods = true)
+  static class JavaDocBuilder {
+    private JavaDocBuilder() {}
+
+    static <A, B> Generator<A, B> noJavaDoc() {
+      return Generator.emptyGen();
+    }
+
+    static <A, B> Generator<A, B> javaDoc(Generator<A, B> javaDocGen) {
+      return javaDocGen;
+    }
+
+    static <A, B> Generator<A, B> javaDoc(BiFunction<A, B, String> genJavaDoc) {
+      return (data, settings, writer) -> writer.println(genJavaDoc.apply(data, settings));
+    }
+
+    static <A, B> Generator<A, B> javaDoc(Function<A, String> genJavaDoc) {
+      return (data, settings, writer) -> writer.println(genJavaDoc.apply(data));
+    }
   }
 
   @FieldBuilder(fieldName = "modifiers")
