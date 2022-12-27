@@ -28,6 +28,7 @@ class ClassGenTest {
             .topLevel()
             .packageGen(PACKAGE_GEN)
             .noJavaDoc()
+            .noAnnotations()
             .modifiers(JavaModifier.PUBLIC)
             .className((data, s) -> data.getText())
             .noSuperClass()
@@ -55,6 +56,7 @@ class ClassGenTest {
             .topLevel()
             .packageGen(PACKAGE_GEN)
             .javaDoc((data, settings) -> String.format("/** %s */", data.getText()))
+            .noAnnotations()
             .modifiers(JavaModifier.PUBLIC)
             .className((data, s) -> data.getText())
             .noSuperClass()
@@ -83,6 +85,7 @@ class ClassGenTest {
             .topLevel()
             .packageGen(PACKAGE_GEN)
             .noJavaDoc()
+            .noAnnotations()
             .modifiers(JavaModifier.PUBLIC)
             .className((data, s) -> data.getText())
             .noSuperClass()
@@ -110,6 +113,7 @@ class ClassGenTest {
             .topLevel()
             .packageGen(PACKAGE_GEN)
             .noJavaDoc()
+            .noAnnotations()
             .modifiers(JavaModifier.PUBLIC)
             .className((data, s) -> data.getText())
             .noSuperClass()
@@ -137,6 +141,7 @@ class ClassGenTest {
             .topLevel()
             .packageGen(PACKAGE_GEN)
             .noJavaDoc()
+            .noAnnotations()
             .modifiers(JavaModifier.PUBLIC)
             .className((data, s) -> data.getText())
             .noSuperClass()
@@ -164,6 +169,7 @@ class ClassGenTest {
             .topLevel()
             .packageGen(PACKAGE_GEN)
             .noJavaDoc()
+            .noAnnotations()
             .modifiers(JavaModifier.PUBLIC)
             .className((data, s) -> data.getText())
             .noSuperClass()
@@ -191,6 +197,7 @@ class ClassGenTest {
             .nested()
             .packageGen(Generator.emptyGen())
             .noJavaDoc()
+            .noAnnotations()
             .modifiers(JavaModifier.PUBLIC)
             .className((data, s) -> data.getText())
             .noSuperClass()
@@ -213,6 +220,7 @@ class ClassGenTest {
             .nested()
             .packageGen(PACKAGE_GEN)
             .noJavaDoc()
+            .noAnnotations()
             .modifiers(modifiers)
             .className((data, s) -> data.getText())
             .noSuperClass()
@@ -233,6 +241,7 @@ class ClassGenTest {
             .nested()
             .packageGen(Generator.emptyGen())
             .noJavaDoc()
+            .noAnnotations()
             .modifiers(JavaModifier.PUBLIC)
             .className((data, s) -> data.getText())
             .superClass((p, s) -> "Superclass")
@@ -253,6 +262,7 @@ class ClassGenTest {
             .nested()
             .packageGen(Generator.emptyGen())
             .noJavaDoc()
+            .noAnnotations()
             .modifiers(JavaModifier.PUBLIC)
             .className((p, s) -> p.getList().apply(0).getText())
             .superClass((p, s) -> "Superclass")
@@ -265,6 +275,31 @@ class ClassGenTest {
             TestData.stringListData("Hello", "World"), noSettings(), Writer.createDefault());
     assertEquals(
         "public class Hello extends Superclass implements World {\n" + "}", writer.asString());
+  }
+
+  @Test
+  void generate_when_annotations_then_correctOutput() {
+    final ClassGen<ListData<StringData>, Void> generator =
+        ClassGenBuilder.<ListData<StringData>, Void>create()
+            .clazz()
+            .nested()
+            .packageGen(Generator.emptyGen())
+            .noJavaDoc()
+            .annotations(
+                PList.of(
+                    (d, s, w) -> w.println("@%s", d.getList().apply(0).getText()),
+                    (d, s, w) -> w.println("@%s", d.getList().apply(1).getText())))
+            .modifiers(JavaModifier.PUBLIC)
+            .className((p, s) -> p.getList().apply(0).getText())
+            .noSuperClass()
+            .noInterfaces()
+            .content(Generator.ofWriterFunction(w -> w.ref("import java.util.Optional;")))
+            .build();
+
+    final Writer writer =
+        generator.generate(
+            TestData.stringListData("Hello", "World"), noSettings(), Writer.createDefault());
+    assertEquals("@Hello\n" + "@World\n" + "public class Hello {\n" + "}", writer.asString());
   }
 
   private static Stream<Arguments> publicAndFinalModifierUnordered() {

@@ -16,6 +16,7 @@ public class ClassGen<A, B> implements Generator<A, B> {
   private final Declaration declaration;
   private final Generator<A, B> packageGen;
   private final Generator<A, B> javaDocGen;
+  private final PList<Generator<A, B>> annotationGens;
   private final BiFunction<A, B, JavaModifiers> modifiers;
   private final BiFunction<A, B, String> createClassName;
   private final BiFunction<A, B, Optional<String>> superClass;
@@ -28,6 +29,7 @@ public class ClassGen<A, B> implements Generator<A, B> {
       Declaration declaration,
       Generator<A, B> packageGen,
       Generator<A, B> javaDocGen,
+      PList<Generator<A, B>> annotationGens,
       BiFunction<A, B, JavaModifiers> modifiers,
       BiFunction<A, B, String> createClassName,
       BiFunction<A, B, Optional<String>> superClass,
@@ -37,6 +39,7 @@ public class ClassGen<A, B> implements Generator<A, B> {
     this.declaration = declaration;
     this.packageGen = packageGen;
     this.javaDocGen = javaDocGen;
+    this.annotationGens = annotationGens;
     this.modifiers = modifiers;
     this.createClassName = createClassName;
     this.superClass = superClass;
@@ -53,6 +56,7 @@ public class ClassGen<A, B> implements Generator<A, B> {
     return packageGen()
         .append(this::refs)
         .append(javaDocGen)
+        .append(annotationGens.reduce(Generator::append).orElse(Generator.emptyGen()))
         .append(this::classStart)
         .append(contentGenerator, 1)
         .append(this::classEnd)
@@ -151,6 +155,31 @@ public class ClassGen<A, B> implements Generator<A, B> {
 
     static <A, B> Generator<A, B> javaDoc(Function<A, String> genJavaDoc) {
       return (data, settings, writer) -> writer.println(genJavaDoc.apply(data));
+    }
+  }
+
+  @FieldBuilder(fieldName = "annotationGens", disableDefaultMethods = true)
+  static class AnnotationGenBuilder {
+    private AnnotationGenBuilder() {}
+
+    static <A, B> PList<Generator<A, B>> noAnnotations() {
+      return PList.empty();
+    }
+
+    static <A, B> PList<Generator<A, B>> singleAnnotation(Generator<A, B> annotation) {
+      return PList.single(annotation);
+    }
+
+    static <A, B> PList<Generator<A, B>> singleAnnotation(BiFunction<A, B, String> annotation) {
+      return PList.single((a, b, writer) -> writer.println(annotation.apply(a, b)));
+    }
+
+    static <A, B> PList<Generator<A, B>> singleAnnotation(Function<A, String> annotation) {
+      return PList.single((a, b, writer) -> writer.println(annotation.apply(a)));
+    }
+
+    static <A, B> PList<Generator<A, B>> annotations(PList<Generator<A, B>> annotations) {
+      return annotations;
     }
   }
 
