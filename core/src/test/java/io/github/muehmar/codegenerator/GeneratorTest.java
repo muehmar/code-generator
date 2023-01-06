@@ -173,6 +173,15 @@ class GeneratorTest {
   }
 
   @Test
+  void int_when_called_then_indentedByGivenTabs() {
+    final Generator<Void, Void> genA = constant("genA");
+
+    final Writer writer = genA.indent(2).generate(noData(), noSettings(), Writer.createDefault());
+
+    assertEquals("    genA", writer.asString());
+  }
+
+  @Test
   void contraMap_when_newGenCalled_then_inputTransformedAccordingly() {
     final Generator<String, Void> genA = (s, ignore, w) -> w.println(s);
 

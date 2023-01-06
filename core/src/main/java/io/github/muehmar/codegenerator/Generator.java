@@ -48,6 +48,11 @@ public interface Generator<A, B> {
     return Generator.<A, B>emptyGen().appendNewLine().append(this);
   }
 
+  /** Returns a new {@link Generator} which is {@code this} indented by the given amout of tabs. */
+  default Generator<A, B> indent(int tabs) {
+    return Generator.<A, B>emptyGen().append(this, tabs);
+  }
+
   /**
    * Returns a new {@link Generator} which will append the content of the given {@link Generator}
    * {@code next} to the content of {@code this}.
