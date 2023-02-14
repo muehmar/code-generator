@@ -2,6 +2,7 @@ package io.github.muehmar.codegenerator;
 
 import ch.bluecare.commons.data.PList;
 import io.github.muehmar.codegenerator.writer.Writer;
+import java.util.Optional;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -132,15 +133,28 @@ public interface Generator<A, B> {
    * <p>The new content is appended in the order of the elements returned by the function {@code f}.
    */
   default <C> Generator<A, B> appendList(
-      Generator<C, B> gen, Function<A, Iterable<C>> f, Generator<A, B> separator) {
+      Generator<C, B> next, Function<A, Iterable<C>> f, Generator<A, B> separator) {
     final Generator<A, B> self = this;
     return (data, settings, writer) -> {
       final Writer selfWriter = self.generate(data, settings, writer);
       return PList.fromIter(f.apply(data))
-          .<UnaryOperator<Writer>>map(e -> w -> gen.generate(e, settings, w))
+          .<UnaryOperator<Writer>>map(e -> w -> next.generate(e, settings, w))
           .reduce((f1, f2) -> w -> f2.apply(separator.generate(data, settings, f1.apply(w))))
           .map(f1 -> f1.apply(selfWriter))
           .orElse(selfWriter);
+    };
+  }
+
+  /**
+   * Returns a new {@link Generator} which will append the content of the given {@link Generator}
+   * {@code next} to the content of {@code this} if the mapping function {@code f} returns a
+   * non-empty {@link Optional}.
+   */
+  default <C> Generator<A, B> appendOptional(Generator<C, B> next, Function<A, Optional<C>> f) {
+    final Generator<A, B> self = this;
+    return (data, settings, writer) -> {
+      final Writer selfWriter = self.generate(data, settings, writer);
+      return f.apply(data).map(c -> next.generate(c, settings, selfWriter)).orElse(selfWriter);
     };
   }
 

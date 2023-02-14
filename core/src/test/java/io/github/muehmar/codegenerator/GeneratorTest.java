@@ -12,6 +12,8 @@ import io.github.muehmar.codegenerator.TestData.BooleanData;
 import io.github.muehmar.codegenerator.TestData.ListData;
 import io.github.muehmar.codegenerator.TestData.StringData;
 import io.github.muehmar.codegenerator.writer.Writer;
+import java.util.Optional;
+import java.util.function.Function;
 import org.junit.jupiter.api.Test;
 
 class GeneratorTest {
@@ -100,6 +102,32 @@ class GeneratorTest {
     final Generator<ListData<StringData>, Void> generator =
         genA.appendList(fieldGen, ignore -> PList.empty(), ofWriterFunction(Writer::println));
     final Writer writer = generator.generate(data, noSettings(), Writer.createDefault());
+
+    assertEquals("genA", writer.asString());
+  }
+
+  @Test
+  void appendOptional_when_nonEmpty_then_contentAdded() {
+    final Generator<Optional<String>, Void> genA = constant("genA");
+    final Generator<String, Void> genB = (data, settings, writer) -> writer.println("-> %s", data);
+
+    final Generator<Optional<String>, Void> generator =
+        genA.appendOptional(genB, Function.identity());
+    final Writer writer =
+        generator.generate(Optional.of("data"), noSettings(), Writer.createDefault());
+
+    assertEquals("genA\n-> data", writer.asString());
+  }
+
+  @Test
+  void appendOptional_when_empty_then_nothingAdded() {
+    final Generator<Optional<String>, Void> genA = constant("genA");
+    final Generator<String, Void> genB = (data, settings, writer) -> writer.println("-> %s", data);
+
+    final Generator<Optional<String>, Void> generator =
+        genA.appendOptional(genB, Function.identity());
+    final Writer writer =
+        generator.generate(Optional.empty(), noSettings(), Writer.createDefault());
 
     assertEquals("genA", writer.asString());
   }
