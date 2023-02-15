@@ -39,6 +39,14 @@ public interface Generator<A, B> {
     return (data, settings, writer) -> writer.println();
   }
 
+  /**
+   * Appends a single blank line if there is not already a blank line. If there is already a blank
+   * line, nothing wil get appended.
+   */
+  default Generator<A, B> appendSingleBlankLine() {
+    return append(Writer::printSingleBlankLine);
+  }
+
   /** Returns a new {@link Generator} which appends a new line to {@code this}. */
   default Generator<A, B> appendNewLine() {
     return append((UnaryOperator<Writer>) Writer::println);

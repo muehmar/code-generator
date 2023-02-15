@@ -62,6 +62,18 @@ public final class Writer {
     return new Writer(refs, refsLineNumber, lines.cons(Line.empty()), tab, 0, true);
   }
 
+  /**
+   * Creates a single blank line, if there is not already a blank line. Does nothing in case there
+   * is already a blank line.
+   */
+  public Writer printSingleBlankLine() {
+    if (lines.headOption().filter(Line::isEmpty).isPresent()
+        && lines.drop(1).headOption().filter(Line::isEmpty).isPresent()) {
+      return this;
+    }
+    return println();
+  }
+
   public Writer tab(int tabs) {
     return new Writer(refs, refsLineNumber, lines, tab, tabs, newline);
   }

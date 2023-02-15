@@ -181,6 +181,18 @@ class GeneratorTest {
   }
 
   @Test
+  void appendSingleBlankLine_when_called_then_outputHasNewLineAppended() {
+    final Generator<Void, Void> genA = constant("genA");
+
+    final Writer writer =
+        genA.appendSingleBlankLine()
+            .appendSingleBlankLine()
+            .generate(noData(), noSettings(), Writer.createDefault());
+
+    assertEquals("genA\n", writer.asString());
+  }
+
+  @Test
   void appendNewLine_when_called_then_outputHasNewLineAppended() {
     final Generator<Void, Void> genA = constant("genA");
 

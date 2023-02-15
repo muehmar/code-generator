@@ -144,4 +144,16 @@ class WriterTest {
 
     assertEquals("import java.util.Optional;", output);
   }
+
+  @Test
+  void printSingleBlankLine_when_calledTwice_then_singleBlankLineAppended() {
+    final String output =
+        Writer.createDefault()
+            .println("hello")
+            .printSingleBlankLine()
+            .printSingleBlankLine()
+            .println("HELLO")
+            .asString();
+    assertEquals("hello\n\nHELLO", output);
+  }
 }

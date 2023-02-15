@@ -53,6 +53,14 @@ public class Line {
     return sb;
   }
 
+  public boolean isEmpty() {
+    return fragments.isEmpty();
+  }
+
+  public boolean nonEmpty() {
+    return fragments.nonEmpty();
+  }
+
   public String asString() {
     return asStringBuilder().toString();
   }
