@@ -4,15 +4,15 @@ import ch.bluecare.commons.data.PList;
 import io.github.muehmar.codegenerator.Generator;
 import io.github.muehmar.codegenerator.util.Strings;
 import io.github.muehmar.codegenerator.writer.Writer;
-import io.github.muehmar.pojoextension.annotations.FieldBuilder;
-import io.github.muehmar.pojoextension.annotations.OptionalDetection;
-import io.github.muehmar.pojoextension.annotations.SafeBuilder;
+import io.github.muehmar.pojobuilder.annotations.FieldBuilder;
+import io.github.muehmar.pojobuilder.annotations.OptionalDetection;
+import io.github.muehmar.pojobuilder.annotations.PojoBuilder;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
-@SafeBuilder(optionalDetection = OptionalDetection.NONE)
+@PojoBuilder(optionalDetection = OptionalDetection.NONE)
 public class MethodGen<A, B> implements Generator<A, B> {
   private final BiFunction<A, B, JavaModifiers> createModifiers;
   private final BiFunction<A, B, PList<String>> createGenericTypeParameters;

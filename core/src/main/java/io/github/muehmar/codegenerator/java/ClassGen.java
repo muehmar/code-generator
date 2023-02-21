@@ -4,13 +4,13 @@ import ch.bluecare.commons.data.PList;
 import io.github.muehmar.codegenerator.Generator;
 import io.github.muehmar.codegenerator.util.Strings;
 import io.github.muehmar.codegenerator.writer.Writer;
-import io.github.muehmar.pojoextension.annotations.FieldBuilder;
-import io.github.muehmar.pojoextension.annotations.SafeBuilder;
+import io.github.muehmar.pojobuilder.annotations.FieldBuilder;
+import io.github.muehmar.pojobuilder.annotations.PojoBuilder;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-@SafeBuilder
+@PojoBuilder
 public class ClassGen<A, B> implements Generator<A, B> {
   private final ClassType type;
   private final Declaration declaration;
