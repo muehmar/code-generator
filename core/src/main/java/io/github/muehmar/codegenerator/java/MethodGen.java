@@ -156,6 +156,11 @@ public class MethodGen<A, B> implements Generator<A, B> {
     private ArgumentsBuilder() {}
 
     static <A, B> BiFunction<A, B, PList<String>> arguments(
+        BiFunction<A, B, PList<String>> createArguments) {
+      return createArguments;
+    }
+
+    static <A, B> BiFunction<A, B, PList<String>> arguments(
         Function<A, PList<String>> createArguments) {
       return (data, settings) -> createArguments.apply(data);
     }
