@@ -112,6 +112,10 @@ public final class Writer {
     return new Writer(refs.cons(ref), refsLineNumber, lines, tab, tabs, newline);
   }
 
+  public Writer refs(Iterable<String> ref) {
+    return new Writer(refs.concat(PList.fromIter(ref)), refsLineNumber, lines, tab, tabs, newline);
+  }
+
   public PList<String> getRefs() {
     return refs;
   }

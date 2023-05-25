@@ -16,7 +16,7 @@ import java.util.function.UnaryOperator;
 public class MethodGen<A, B> implements Generator<A, B> {
   private final BiFunction<A, B, JavaModifiers> createModifiers;
   private final BiFunction<A, B, PList<String>> createGenericTypeParameters;
-  private final BiFunction<A, B, String> createReturnType;
+  private final Generator<A, B> createReturnType;
   private final BiFunction<A, B, String> createMethodName;
   private final BiFunction<A, B, PList<String>> createArguments;
   private final Optional<Generator<A, B>> contentGenerator;
@@ -24,7 +24,7 @@ public class MethodGen<A, B> implements Generator<A, B> {
   MethodGen(
       BiFunction<A, B, JavaModifiers> createModifiers,
       BiFunction<A, B, PList<String>> createGenericTypeParameters,
-      BiFunction<A, B, String> createReturnType,
+      Generator<A, B> createReturnType,
       BiFunction<A, B, String> createMethodName,
       BiFunction<A, B, PList<String>> createArguments,
       Optional<Generator<A, B>> contentGenerator) {
@@ -44,18 +44,20 @@ public class MethodGen<A, B> implements Generator<A, B> {
               final String genericTypeParameters =
                   Strings.surroundIfNotEmpty(
                       "<", createGenericTypeParameters.apply(data, settings).mkString(", "), "> ");
-              final String returnType = createReturnType.apply(data, settings);
+              final Writer returnTypeWriter =
+                  createReturnType.generate(data, settings, Writer.createDefault());
               final String methodName = createMethodName.apply(data, settings);
               final String arguments = createArguments.apply(data, settings).mkString(", ");
               final String openingBracket = contentGenerator.isPresent() ? " {" : ";";
               return w.print(
-                  "%s%s%s %s(%s)%s",
-                  modifiers.asStringTrailingWhitespace(),
-                  genericTypeParameters,
-                  returnType,
-                  methodName,
-                  arguments,
-                  openingBracket);
+                      "%s%s%s %s(%s)%s",
+                      modifiers.asStringTrailingWhitespace(),
+                      genericTypeParameters,
+                      returnTypeWriter.asString(),
+                      methodName,
+                      arguments,
+                      openingBracket)
+                  .refs(returnTypeWriter.getRefs());
             })
         .append(contentGenerator.orElse(Generator.emptyGen()), 1)
         .append(w -> contentGenerator.isPresent() ? w.println("}") : w)
@@ -121,16 +123,20 @@ public class MethodGen<A, B> implements Generator<A, B> {
   static class ReturnTypeBuilder {
     private ReturnTypeBuilder() {}
 
-    static <A, B> BiFunction<A, B, String> returnType(Function<A, String> createReturnType) {
-      return (data, settings) -> createReturnType.apply(data);
+    static <A, B> Generator<A, B> returnType(Generator<A, B> gen) {
+      return gen;
     }
 
-    static <A, B> BiFunction<A, B, String> returnTypeName(Function<A, Object> createReturnType) {
-      return (d, s) -> createReturnType.apply(d).toString();
+    static <A, B> Generator<A, B> returnType(Function<A, String> createReturnType) {
+      return (data, settings, w) -> w.println(createReturnType.apply(data));
     }
 
-    static <A, B> BiFunction<A, B, String> returnType(String returnType) {
-      return (d, s) -> returnType;
+    static <A, B> Generator<A, B> returnTypeName(Function<A, Object> createReturnType) {
+      return (d, s, w) -> w.println(createReturnType.apply(d).toString());
+    }
+
+    static <A, B> Generator<A, B> returnType(String returnType) {
+      return (d, s, w) -> w.println(returnType);
     }
   }
 

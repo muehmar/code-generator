@@ -4,6 +4,7 @@ import static io.github.muehmar.codegenerator.TestSettings.noSettings;
 import static io.github.muehmar.codegenerator.java.JavaModifier.FINAL;
 import static io.github.muehmar.codegenerator.java.JavaModifier.PUBLIC;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import ch.bluecare.commons.data.PList;
 import io.github.muehmar.codegenerator.writer.Writer;
@@ -48,5 +49,24 @@ class MethodGenTest {
         generator.generate("data", noSettings(), Writer.createDefault()).asString();
     assertEquals(
         "public final <T, S> T doSomething(S s) {\n" + "  return s.getT();\n" + "}", output);
+  }
+
+  @Test
+  void generate_when_generatorForReturnType_then_outputAndRefsCorrect() {
+    final MethodGen<String, Void> generator =
+        MethodGenBuilder.<String, Void>create()
+            .modifiers(PUBLIC, FINAL)
+            .noGenericTypes()
+            .returnType((d, s, w) -> w.println("returnSomething").ref("somethingRef"))
+            .methodName("doSomething")
+            .noArguments()
+            .contentWriter(w -> w.println("return xyz;"))
+            .build();
+
+    final Writer writer = generator.generate("data", noSettings(), Writer.createDefault());
+    assertEquals(
+        "public final returnSomething doSomething() {\n" + "  return xyz;\n" + "}",
+        writer.asString());
+    assertTrue(writer.getRefs().exists("somethingRef"::equals));
   }
 }
