@@ -20,8 +20,8 @@ public interface Generator<A, B> {
   }
 
   /** Creates a new {@link Generator} producing the given constant. */
-  static <A, B> Generator<A, B> constant(String constant) {
-    return (data, settings, writer) -> writer.println(constant);
+  static <A, B> Generator<A, B> constant(String constant, Object... args) {
+    return (data, settings, writer) -> writer.println(String.format(constant, args));
   }
 
   /** Creates a new {@link Generator} by applying the given function on the {@link Writer}. */
