@@ -19,9 +19,11 @@ public interface Generator<A, B> {
     return gen;
   }
 
-  /** Creates a new {@link Generator} producing the given constant. */
-  static <A, B> Generator<A, B> constant(String constant, Object... args) {
-    return (data, settings, writer) -> writer.println(String.format(constant, args));
+  /**
+   * Creates a new {@link Generator} producing a formatted string using the format and arguments.
+   */
+  static <A, B> Generator<A, B> constant(String format, Object... args) {
+    return (data, settings, writer) -> writer.println(String.format(format, args));
   }
 
   /** Creates a new {@link Generator} by applying the given function on the {@link Writer}. */
@@ -112,7 +114,7 @@ public interface Generator<A, B> {
    * {@code next} to the content of {@code this} while transforming the input data with the given
    * function {@code f} for the next generator.
    */
-  default <C> Generator<A, B> append(Generator<C, B> gen, Function<A, C> f) {
+  default <C> Generator<A, B> append(Generator<C, B> gen, Function<A, ? extends C> f) {
     final Generator<A, B> self = this;
     return (data, settings, writer) -> {
       final Writer selfWriter = self.generate(data, settings, writer);
@@ -126,7 +128,8 @@ public interface Generator<A, B> {
    * which is returned by the given function {@code f} applied to the input data. The new content is
    * appended in the order of the elements returned by the function {@code f}.
    */
-  default <C> Generator<A, B> appendList(Generator<C, B> gen, Function<A, Iterable<C>> f) {
+  default <C> Generator<A, B> appendList(
+      Generator<C, B> gen, Function<A, ? extends Iterable<C>> f) {
     return appendList(gen, f, Generator.emptyGen());
   }
 
@@ -141,7 +144,7 @@ public interface Generator<A, B> {
    * <p>The new content is appended in the order of the elements returned by the function {@code f}.
    */
   default <C> Generator<A, B> appendList(
-      Generator<C, B> next, Function<A, Iterable<C>> f, Generator<A, B> separator) {
+      Generator<C, B> next, Function<A, ? extends Iterable<C>> f, Generator<A, B> separator) {
     final Generator<A, B> self = this;
     return (data, settings, writer) -> {
       final Writer selfWriter = self.generate(data, settings, writer);
@@ -170,7 +173,7 @@ public interface Generator<A, B> {
    * Returns a new {@link Generator} which will append the content of the given {@link Generator}
    * {@code next} to the content of {@code this} only if the given {@link Predicate} holds true;
    */
-  default Generator<A, B> appendConditionally(BiPredicate<A, B> predicate, Generator<A, B> append) {
+  default Generator<A, B> appendConditionally(Generator<A, B> append, BiPredicate<A, B> predicate) {
     final Generator<A, B> self = this;
     return (data, settings, writer) -> {
       if (predicate.negate().test(data, settings)) {
@@ -184,8 +187,8 @@ public interface Generator<A, B> {
    * Returns a new {@link Generator} which will append the content of the given {@link Generator}
    * {@code next} to the content of {@code this} only if the given {@link Predicate} holds true;
    */
-  default Generator<A, B> appendConditionally(Predicate<A> predicate, Generator<A, B> append) {
-    return appendConditionally((data, settings) -> predicate.test(data), append);
+  default Generator<A, B> appendConditionally(Generator<A, B> append, Predicate<A> predicate) {
+    return appendConditionally(append, (data, settings) -> predicate.test(data));
   }
 
   /**

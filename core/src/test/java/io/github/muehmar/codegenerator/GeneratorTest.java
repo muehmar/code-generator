@@ -145,7 +145,7 @@ class GeneratorTest {
     final Generator<BooleanData, Void> genB = constant("genB");
 
     final Generator<BooleanData, Void> generator =
-        genA.appendConditionally(BooleanData::isFlag, genB);
+        genA.appendConditionally(genB, BooleanData::isFlag);
     final Writer writer =
         generator.generate(booleanData(true), noSettings(), Writer.createDefault());
 
@@ -158,7 +158,7 @@ class GeneratorTest {
     final Generator<BooleanData, Void> genB = constant("genB");
 
     final Generator<BooleanData, Void> generator =
-        genA.appendConditionally(BooleanData::isFlag, genB);
+        genA.appendConditionally(genB, BooleanData::isFlag);
     final Writer writer =
         generator.generate(booleanData(false), noSettings(), Writer.createDefault());
 
