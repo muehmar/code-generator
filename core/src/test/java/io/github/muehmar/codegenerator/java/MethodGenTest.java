@@ -3,6 +3,7 @@ package io.github.muehmar.codegenerator.java;
 import static io.github.muehmar.codegenerator.TestSettings.noSettings;
 import static io.github.muehmar.codegenerator.java.JavaModifier.FINAL;
 import static io.github.muehmar.codegenerator.java.JavaModifier.PUBLIC;
+import static io.github.muehmar.codegenerator.writer.Writer.javaWriter;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -25,7 +26,7 @@ class MethodGenTest {
 
     final PList<String> data = PList.of("void", "getXY", "String a", "int b");
 
-    final String output = generator.generate(data, noSettings(), Writer.createDefault()).asString();
+    final String output = generator.generate(data, noSettings(), javaWriter()).asString();
     assertEquals(
         "public final void getXY(String a, int b) {\n"
             + "  System.out.println(\"Hello World\");\n"
@@ -45,8 +46,7 @@ class MethodGenTest {
             .contentWriter(w -> w.println("return s.getT();"))
             .build();
 
-    final String output =
-        generator.generate("data", noSettings(), Writer.createDefault()).asString();
+    final String output = generator.generate("data", noSettings(), javaWriter()).asString();
     assertEquals(
         "public final <T, S> T doSomething(S s) {\n" + "  return s.getT();\n" + "}", output);
   }
@@ -63,7 +63,7 @@ class MethodGenTest {
             .contentWriter(w -> w.println("return xyz;"))
             .build();
 
-    final Writer writer = generator.generate("data", noSettings(), Writer.createDefault());
+    final Writer writer = generator.generate("data", noSettings(), javaWriter());
     assertEquals(
         "public final returnSomething doSomething() {\n" + "  return xyz;\n" + "}",
         writer.asString());

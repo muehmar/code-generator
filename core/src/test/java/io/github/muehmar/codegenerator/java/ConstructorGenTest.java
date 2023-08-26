@@ -1,9 +1,9 @@
 package io.github.muehmar.codegenerator.java;
 
+import static io.github.muehmar.codegenerator.writer.Writer.javaWriter;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import ch.bluecare.commons.data.PList;
-import io.github.muehmar.codegenerator.writer.Writer;
 import org.junit.jupiter.api.Test;
 
 class ConstructorGenTest {
@@ -19,7 +19,7 @@ class ConstructorGenTest {
 
     final PList<String> data = PList.of("Customer", "String a", "int b");
 
-    final String output = generator.generate(data, null, Writer.createDefault()).asString();
+    final String output = generator.generate(data, null, javaWriter()).asString();
     assertEquals(
         "public Customer(String a, int b) {\n" + "  System.out.println(\"Hello World\");\n" + "}",
         output);
