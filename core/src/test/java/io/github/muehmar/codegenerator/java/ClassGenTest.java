@@ -1,6 +1,7 @@
 package io.github.muehmar.codegenerator.java;
 
 import static io.github.muehmar.codegenerator.TestSettings.noSettings;
+import static io.github.muehmar.codegenerator.writer.Writer.javaWriter;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import ch.bluecare.commons.data.PList;
@@ -37,7 +38,7 @@ class ClassGenTest {
             .build();
 
     final Writer writer =
-        generator.generate(new StringData("HelloWorld"), noSettings(), Writer.createDefault());
+        generator.generate(new StringData("HelloWorld"), noSettings(), javaWriter());
     assertEquals(
         "package io.github.muehmar;\n"
             + "\n"
@@ -65,7 +66,7 @@ class ClassGenTest {
             .build();
 
     final Writer writer =
-        generator.generate(new StringData("HelloWorld"), noSettings(), Writer.createDefault());
+        generator.generate(new StringData("HelloWorld"), noSettings(), javaWriter());
     assertEquals(
         "package io.github.muehmar;\n"
             + "\n"
@@ -94,7 +95,7 @@ class ClassGenTest {
             .build();
 
     final Writer writer =
-        generator.generate(new StringData("HelloWorld"), noSettings(), Writer.createDefault());
+        generator.generate(new StringData("HelloWorld"), noSettings(), javaWriter());
     assertEquals(
         "package io.github.muehmar;\n"
             + "\n"
@@ -122,7 +123,7 @@ class ClassGenTest {
             .build();
 
     final Writer writer =
-        generator.generate(new StringData("HelloWorld"), noSettings(), Writer.createDefault());
+        generator.generate(new StringData("HelloWorld"), noSettings(), javaWriter());
     assertEquals(
         "package io.github.muehmar;\n"
             + "\n"
@@ -150,7 +151,7 @@ class ClassGenTest {
             .build();
 
     final Writer writer =
-        generator.generate(new StringData("HelloWorld"), noSettings(), Writer.createDefault());
+        generator.generate(new StringData("HelloWorld"), noSettings(), javaWriter());
     assertEquals(
         "package io.github.muehmar;\n"
             + "\n"
@@ -178,7 +179,7 @@ class ClassGenTest {
             .build();
 
     final Writer writer =
-        generator.generate(new StringData("HelloWorld"), noSettings(), Writer.createDefault());
+        generator.generate(new StringData("HelloWorld"), noSettings(), javaWriter());
     assertEquals(
         "package io.github.muehmar;\n"
             + "\n"
@@ -206,7 +207,7 @@ class ClassGenTest {
             .build();
 
     final Writer writer =
-        generator.generate(new StringData("HelloWorld"), noSettings(), Writer.createDefault());
+        generator.generate(new StringData("HelloWorld"), noSettings(), javaWriter());
     assertEquals("public class HelloWorld {\n" + "}", writer.asString());
   }
 
@@ -229,7 +230,7 @@ class ClassGenTest {
             .build();
 
     final Writer writer =
-        generator.generate(new StringData("HelloWorld"), noSettings(), Writer.createDefault());
+        generator.generate(new StringData("HelloWorld"), noSettings(), javaWriter());
     assertEquals("public final class HelloWorld {\n" + "}", writer.asString());
   }
 
@@ -250,7 +251,7 @@ class ClassGenTest {
             .build();
 
     final Writer writer =
-        generator.generate(new StringData("HelloWorld"), noSettings(), Writer.createDefault());
+        generator.generate(new StringData("HelloWorld"), noSettings(), javaWriter());
     assertEquals("public class HelloWorld extends Superclass {\n" + "}", writer.asString());
   }
 
@@ -271,8 +272,7 @@ class ClassGenTest {
             .build();
 
     final Writer writer =
-        generator.generate(
-            TestData.stringListData("Hello", "World"), noSettings(), Writer.createDefault());
+        generator.generate(TestData.stringListData("Hello", "World"), noSettings(), javaWriter());
     assertEquals(
         "public class Hello extends Superclass implements World {\n" + "}", writer.asString());
   }
@@ -297,8 +297,7 @@ class ClassGenTest {
             .build();
 
     final Writer writer =
-        generator.generate(
-            TestData.stringListData("Hello", "World"), noSettings(), Writer.createDefault());
+        generator.generate(TestData.stringListData("Hello", "World"), noSettings(), javaWriter());
     assertEquals("@Hello\n" + "@World\n" + "public class Hello {\n" + "}", writer.asString());
   }
 

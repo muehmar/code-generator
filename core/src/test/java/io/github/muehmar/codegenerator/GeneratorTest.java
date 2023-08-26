@@ -5,6 +5,7 @@ import static io.github.muehmar.codegenerator.Generator.ofWriterFunction;
 import static io.github.muehmar.codegenerator.TestData.booleanData;
 import static io.github.muehmar.codegenerator.TestData.noData;
 import static io.github.muehmar.codegenerator.TestSettings.noSettings;
+import static io.github.muehmar.codegenerator.writer.Writer.javaWriter;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import ch.bluecare.commons.data.PList;
@@ -21,21 +22,21 @@ class GeneratorTest {
   @Test
   void constant_when_created_then_correctOutput() {
     final Generator<Void, Void> gen = constant("Hello World!");
-    final Writer writer = gen.generate(noData(), noSettings(), Writer.createDefault());
+    final Writer writer = gen.generate(noData(), noSettings(), javaWriter());
     assertEquals("Hello World!", writer.asString());
   }
 
   @Test
   void constant_when_formatArguments_then_correctOutput() {
     final Generator<Void, Void> gen = constant("Hello %s!", "World");
-    final Writer writer = gen.generate(noData(), noSettings(), Writer.createDefault());
+    final Writer writer = gen.generate(noData(), noSettings(), javaWriter());
     assertEquals("Hello World!", writer.asString());
   }
 
   @Test
   void ofWriterFunction_when_created_then_correctOutput() {
     final Generator<Void, Void> gen = ofWriterFunction(w -> w.println("Hello World!"));
-    final Writer writer = gen.generate(noData(), noSettings(), Writer.createDefault());
+    final Writer writer = gen.generate(noData(), noSettings(), javaWriter());
     assertEquals("Hello World!", writer.asString());
   }
 
@@ -45,7 +46,7 @@ class GeneratorTest {
     final Generator<Void, Void> genB = constant("genB");
 
     final Generator<Void, Void> gen = genA.append(genB);
-    final Writer writer = gen.generate(noData(), noSettings(), Writer.createDefault());
+    final Writer writer = gen.generate(noData(), noSettings(), javaWriter());
     assertEquals("genA\ngenB", writer.asString());
   }
 
@@ -55,7 +56,7 @@ class GeneratorTest {
     final Generator<Void, Void> genB = constant("genB");
 
     final Generator<Void, Void> gen = genA.append(genB, 2);
-    final Writer writer = gen.generate(noData(), noSettings(), Writer.createDefault());
+    final Writer writer = gen.generate(noData(), noSettings(), javaWriter());
     assertEquals("genA\n    genB", writer.asString());
   }
 
@@ -64,7 +65,7 @@ class GeneratorTest {
     final Generator<Void, Void> genA = constant("genA");
 
     final Generator<Void, Void> gen = genA.append(w -> w.println("appended"));
-    final Writer writer = gen.generate(noData(), noSettings(), Writer.createDefault());
+    final Writer writer = gen.generate(noData(), noSettings(), javaWriter());
     assertEquals("genA\nappended", writer.asString());
   }
 
@@ -78,7 +79,7 @@ class GeneratorTest {
 
     final Generator<ListData<StringData>, Void> generator =
         genA.appendList(fieldGen, ListData::getList);
-    final Writer writer = generator.generate(data, noSettings(), Writer.createDefault());
+    final Writer writer = generator.generate(data, noSettings(), javaWriter());
 
     assertEquals("genA\nid\nusername\nnickname", writer.asString());
   }
@@ -93,7 +94,7 @@ class GeneratorTest {
 
     final Generator<ListData<StringData>, Void> generator =
         genA.appendList(fieldGen, ListData::getList, ofWriterFunction(Writer::println));
-    final Writer writer = generator.generate(data, noSettings(), Writer.createDefault());
+    final Writer writer = generator.generate(data, noSettings(), javaWriter());
 
     assertEquals("genA\nid\n\nusername\n\nnickname", writer.asString());
   }
@@ -108,7 +109,7 @@ class GeneratorTest {
 
     final Generator<ListData<StringData>, Void> generator =
         genA.appendList(fieldGen, ignore -> PList.empty(), ofWriterFunction(Writer::println));
-    final Writer writer = generator.generate(data, noSettings(), Writer.createDefault());
+    final Writer writer = generator.generate(data, noSettings(), javaWriter());
 
     assertEquals("genA", writer.asString());
   }
@@ -120,8 +121,7 @@ class GeneratorTest {
 
     final Generator<Optional<String>, Void> generator =
         genA.appendOptional(genB, Function.identity());
-    final Writer writer =
-        generator.generate(Optional.of("data"), noSettings(), Writer.createDefault());
+    final Writer writer = generator.generate(Optional.of("data"), noSettings(), javaWriter());
 
     assertEquals("genA\n-> data", writer.asString());
   }
@@ -133,8 +133,7 @@ class GeneratorTest {
 
     final Generator<Optional<String>, Void> generator =
         genA.appendOptional(genB, Function.identity());
-    final Writer writer =
-        generator.generate(Optional.empty(), noSettings(), Writer.createDefault());
+    final Writer writer = generator.generate(Optional.empty(), noSettings(), javaWriter());
 
     assertEquals("genA", writer.asString());
   }
@@ -146,8 +145,7 @@ class GeneratorTest {
 
     final Generator<BooleanData, Void> generator =
         genA.appendConditionally(genB, BooleanData::isFlag);
-    final Writer writer =
-        generator.generate(booleanData(true), noSettings(), Writer.createDefault());
+    final Writer writer = generator.generate(booleanData(true), noSettings(), javaWriter());
 
     assertEquals("genA\ngenB", writer.asString());
   }
@@ -159,8 +157,7 @@ class GeneratorTest {
 
     final Generator<BooleanData, Void> generator =
         genA.appendConditionally(genB, BooleanData::isFlag);
-    final Writer writer =
-        generator.generate(booleanData(false), noSettings(), Writer.createDefault());
+    final Writer writer = generator.generate(booleanData(false), noSettings(), javaWriter());
 
     assertEquals("genA", writer.asString());
   }
@@ -171,7 +168,7 @@ class GeneratorTest {
 
     final Generator<Integer, Integer> generator = genA.filter((i1, i2) -> i1 + i2 == 3);
 
-    final Writer writer = generator.generate(1, 2, Writer.createDefault());
+    final Writer writer = generator.generate(1, 2, javaWriter());
 
     assertEquals("genA", writer.asString());
   }
@@ -182,7 +179,7 @@ class GeneratorTest {
 
     final Generator<Integer, Integer> generator = genA.filter((i1, i2) -> i1 + i2 == 3);
 
-    final Writer writer = generator.generate(2, 2, Writer.createDefault());
+    final Writer writer = generator.generate(2, 2, javaWriter());
 
     assertEquals("", writer.asString());
   }
@@ -194,7 +191,7 @@ class GeneratorTest {
     final Writer writer =
         genA.appendSingleBlankLine()
             .appendSingleBlankLine()
-            .generate(noData(), noSettings(), Writer.createDefault());
+            .generate(noData(), noSettings(), javaWriter());
 
     assertEquals("genA\n", writer.asString());
   }
@@ -203,8 +200,7 @@ class GeneratorTest {
   void appendNewLine_when_called_then_outputHasNewLineAppended() {
     final Generator<Void, Void> genA = constant("genA");
 
-    final Writer writer =
-        genA.appendNewLine().generate(noData(), noSettings(), Writer.createDefault());
+    final Writer writer = genA.appendNewLine().generate(noData(), noSettings(), javaWriter());
 
     assertEquals("genA\n", writer.asString());
   }
@@ -213,8 +209,7 @@ class GeneratorTest {
   void prependNewLine_when_called_then_outputHasNewLinePrepended() {
     final Generator<Void, Void> genA = constant("genA");
 
-    final Writer writer =
-        genA.prependNewLine().generate(noData(), noSettings(), Writer.createDefault());
+    final Writer writer = genA.prependNewLine().generate(noData(), noSettings(), javaWriter());
 
     assertEquals("\ngenA", writer.asString());
   }
@@ -223,7 +218,7 @@ class GeneratorTest {
   void int_when_called_then_indentedByGivenTabs() {
     final Generator<Void, Void> genA = constant("genA");
 
-    final Writer writer = genA.indent(2).generate(noData(), noSettings(), Writer.createDefault());
+    final Writer writer = genA.indent(2).generate(noData(), noSettings(), javaWriter());
 
     assertEquals("    genA", writer.asString());
   }
@@ -234,7 +229,7 @@ class GeneratorTest {
 
     final Generator<Integer, Void> generator = genA.contraMap(Integer::toHexString);
 
-    final Writer writer = generator.generate(255, noSettings(), Writer.createDefault());
+    final Writer writer = generator.generate(255, noSettings(), javaWriter());
 
     assertEquals("ff", writer.asString());
   }

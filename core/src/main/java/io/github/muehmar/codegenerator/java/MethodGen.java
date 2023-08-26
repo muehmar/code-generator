@@ -1,5 +1,7 @@
 package io.github.muehmar.codegenerator.java;
 
+import static io.github.muehmar.codegenerator.writer.Writer.javaWriter;
+
 import ch.bluecare.commons.data.PList;
 import io.github.muehmar.codegenerator.Generator;
 import io.github.muehmar.codegenerator.util.Strings;
@@ -45,7 +47,7 @@ public class MethodGen<A, B> implements Generator<A, B> {
                   Strings.surroundIfNotEmpty(
                       "<", createGenericTypeParameters.apply(data, settings).mkString(", "), "> ");
               final Writer returnTypeWriter =
-                  createReturnType.generate(data, settings, Writer.createDefault());
+                  createReturnType.generate(data, settings, javaWriter());
               final String methodName = createMethodName.apply(data, settings);
               final String arguments = createArguments.apply(data, settings).mkString(", ");
               final String openingBracket = contentGenerator.isPresent() ? " {" : ";";
