@@ -7,9 +7,9 @@ This library provides a generator for arbitrary source code. The generator is co
 created out of simpler generators.
 
 This library was primarily created to generate Java source code for
-the [Pojo-Extension](https://github.com/muehmar/pojo-extension) and
-the [OpenAPI Generator](https://github.com/muehmar/gradle-openapi-schema) projects. But it might be useful for other
-projects too.
+the [Pojo-Builder](https://github.com/muehmar/pojo-builder) and
+the [OpenAPI Generator](https://github.com/muehmar/gradle-openapi-schema) projects. It is still in version 0.x and therefore
+may introduce breaking changes between minor versions.
 
 The `Generator` interface defines a single method:
 
@@ -29,7 +29,7 @@ The library contains already some predefined generators for creating Java source
 mentioned projects and may be not yet complete.
 
 The generators can be created with a fluent builder (with the help
-of [Pojo-Extension](https://github.com/muehmar/pojo-extension)), one can use the static factory methods
+of [Pojo-Builder](https://github.com/muehmar/pojo-builder)), one can use the static factory methods
 in `JavaGenerators`:
 
 ```
