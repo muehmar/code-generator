@@ -14,4 +14,8 @@ public class Strings {
   public static boolean nonEmpty(String str) {
     return str.length() > 0;
   }
+
+  public static boolean nonEmptyOrBlank(String str) {
+    return nonEmpty(str.trim());
+  }
 }
