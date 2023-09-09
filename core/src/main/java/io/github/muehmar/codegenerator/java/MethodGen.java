@@ -13,6 +13,7 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
+import lombok.Value;
 
 @PojoBuilder(optionalDetection = OptionalDetection.NONE)
 public class MethodGen<A, B> implements Generator<A, B> {
@@ -20,7 +21,7 @@ public class MethodGen<A, B> implements Generator<A, B> {
   private final BiFunction<A, B, PList<String>> createGenericTypeParameters;
   private final Generator<A, B> createReturnType;
   private final BiFunction<A, B, String> createMethodName;
-  private final BiFunction<A, B, PList<String>> createArguments;
+  private final BiFunction<A, B, PList<Argument>> createArguments;
   private final Optional<Generator<A, B>> contentGenerator;
 
   MethodGen(
@@ -28,7 +29,7 @@ public class MethodGen<A, B> implements Generator<A, B> {
       BiFunction<A, B, PList<String>> createGenericTypeParameters,
       Generator<A, B> createReturnType,
       BiFunction<A, B, String> createMethodName,
-      BiFunction<A, B, PList<String>> createArguments,
+      BiFunction<A, B, PList<Argument>> createArguments,
       Optional<Generator<A, B>> contentGenerator) {
     this.createModifiers = createModifiers;
     this.createGenericTypeParameters = createGenericTypeParameters;
@@ -49,7 +50,11 @@ public class MethodGen<A, B> implements Generator<A, B> {
               final Writer returnTypeWriter =
                   createReturnType.generate(data, settings, javaWriter());
               final String methodName = createMethodName.apply(data, settings);
-              final String arguments = createArguments.apply(data, settings).mkString(", ");
+              final String arguments =
+                  createArguments
+                      .apply(data, settings)
+                      .map(arg -> String.format("%s %s", arg.type, arg.name))
+                      .mkString(", ");
               final String openingBracket = contentGenerator.isPresent() ? " {" : ";";
               return w.print(
                       "%s%s%s %s(%s)%s",
@@ -163,22 +168,22 @@ public class MethodGen<A, B> implements Generator<A, B> {
   static class ArgumentsBuilder {
     private ArgumentsBuilder() {}
 
-    static <A, B> BiFunction<A, B, PList<String>> arguments(
-        BiFunction<A, B, PList<String>> createArguments) {
+    static <A, B> BiFunction<A, B, PList<Argument>> arguments(
+        BiFunction<A, B, PList<Argument>> createArguments) {
       return createArguments;
     }
 
-    static <A, B> BiFunction<A, B, PList<String>> arguments(
-        Function<A, PList<String>> createArguments) {
+    static <A, B> BiFunction<A, B, PList<Argument>> arguments(
+        Function<A, PList<Argument>> createArguments) {
       return (data, settings) -> createArguments.apply(data);
     }
 
-    static <A, B> BiFunction<A, B, PList<String>> singleArgument(
-        Function<A, String> createArgument) {
+    static <A, B> BiFunction<A, B, PList<Argument>> singleArgument(
+        Function<A, Argument> createArgument) {
       return (d, s) -> PList.single(createArgument.apply(d));
     }
 
-    static <A, B> BiFunction<A, B, PList<String>> noArguments() {
+    static <A, B> BiFunction<A, B, PList<Argument>> noArguments() {
       return (d, s) -> PList.empty();
     }
   }
@@ -206,5 +211,11 @@ public class MethodGen<A, B> implements Generator<A, B> {
     static <A, B> Optional<Generator<A, B>> content(Generator<A, B> content) {
       return Optional.of(content);
     }
+  }
+
+  @Value
+  public static class Argument {
+    String type;
+    String name;
   }
 }

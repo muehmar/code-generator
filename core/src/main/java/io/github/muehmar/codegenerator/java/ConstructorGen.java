@@ -8,18 +8,19 @@ import io.github.muehmar.pojobuilder.annotations.PojoBuilder;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
+import lombok.Value;
 
 @PojoBuilder
 public class ConstructorGen<A, B> implements Generator<A, B> {
   private final BiFunction<A, B, JavaModifiers> createModifiers;
   private final BiFunction<A, B, String> createClassName;
-  private final BiFunction<A, B, PList<String>> createArguments;
+  private final BiFunction<A, B, PList<Argument>> createArguments;
   private final Generator<A, B> contentGenerator;
 
   ConstructorGen(
       BiFunction<A, B, JavaModifiers> createModifiers,
       BiFunction<A, B, String> createClassName,
-      BiFunction<A, B, PList<String>> createArguments,
+      BiFunction<A, B, PList<Argument>> createArguments,
       Generator<A, B> contentGenerator) {
     this.createModifiers = createModifiers;
     this.createClassName = createClassName;
@@ -31,7 +32,11 @@ public class ConstructorGen<A, B> implements Generator<A, B> {
   public Writer generate(A data, B settings, Writer writer) {
     return Generator.<A, B>ofWriterFunction(
             w -> {
-              final String arguments = createArguments.apply(data, settings).mkString(", ");
+              final String arguments =
+                  createArguments
+                      .apply(data, settings)
+                      .map(arg -> String.format("%s %s", arg.type, arg.name))
+                      .mkString(", ");
               final String className = createClassName.apply(data, settings);
               final JavaModifiers modifiers = createModifiers.apply(data, settings);
               return w.print(
@@ -76,12 +81,12 @@ public class ConstructorGen<A, B> implements Generator<A, B> {
   static class ClassNameBuilder {
     private ClassNameBuilder() {}
 
-    static <A, B> BiFunction<A, B, String> className(BiFunction<A, B, String> createClassName) {
-      return createClassName;
+    static <A, B> BiFunction<A, B, String> className(BiFunction<A, B, Object> createClassName) {
+      return (data, settings) -> createClassName.apply(data, settings).toString();
     }
 
-    static <A, B> BiFunction<A, B, String> className(Function<A, String> createClassName) {
-      return (d, s) -> createClassName.apply(d);
+    static <A, B> BiFunction<A, B, String> className(Function<A, Object> createClassName) {
+      return (data, settings) -> createClassName.apply(data).toString();
     }
 
     static <A, B> BiFunction<A, B, String> className(String className) {
@@ -93,26 +98,26 @@ public class ConstructorGen<A, B> implements Generator<A, B> {
   static class ArgumentsBuilder {
     private ArgumentsBuilder() {}
 
-    static <A, B> BiFunction<A, B, PList<String>> arguments(
-        BiFunction<A, B, PList<String>> createArguments) {
+    static <A, B> BiFunction<A, B, PList<Argument>> arguments(
+        BiFunction<A, B, PList<Argument>> createArguments) {
       return createArguments;
     }
 
-    static <A, B> BiFunction<A, B, PList<String>> arguments(
-        Function<A, PList<String>> createArguments) {
+    static <A, B> BiFunction<A, B, PList<Argument>> arguments(
+        Function<A, PList<Argument>> createArguments) {
       return (d, s) -> createArguments.apply(d);
     }
 
-    static <A, B> BiFunction<A, B, PList<String>> singleArgument(
-        Function<A, String> createArgument) {
+    static <A, B> BiFunction<A, B, PList<Argument>> singleArgument(
+        Function<A, Argument> createArgument) {
       return (d, s) -> PList.single(createArgument.apply(d));
     }
 
-    static <A, B> BiFunction<A, B, PList<String>> singleArgument(String argument) {
+    static <A, B> BiFunction<A, B, PList<Argument>> singleArgument(Argument argument) {
       return (d, s) -> PList.single(argument);
     }
 
-    static <A, B> BiFunction<A, B, PList<String>> noArguments() {
+    static <A, B> BiFunction<A, B, PList<Argument>> noArguments() {
       return (d, s) -> PList.empty();
     }
   }
@@ -133,8 +138,28 @@ public class ConstructorGen<A, B> implements Generator<A, B> {
       return (data, settings, writer) -> content.apply(writer);
     }
 
+    static <A, B> Generator<A, B> memberAssignmentContent(
+        Function<A, PList<Argument>> createArguments) {
+      return memberAssignmentContent((data, settings) -> createArguments.apply(data));
+    }
+
+    static <A, B> Generator<A, B> memberAssignmentContent(
+        BiFunction<A, B, PList<Argument>> createArguments) {
+      return (data, settings, writer) ->
+          createArguments
+              .apply(data, settings)
+              .map(arg -> String.format("this.%s = %s;", arg.name, arg.name))
+              .foldLeft(writer, Writer::println);
+    }
+
     static <A, B> Generator<A, B> noContent() {
       return (data, settings, writer) -> writer;
     }
+  }
+
+  @Value
+  public static class Argument {
+    String type;
+    String name;
   }
 }

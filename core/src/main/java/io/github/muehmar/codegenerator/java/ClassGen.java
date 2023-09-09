@@ -218,12 +218,12 @@ public class ClassGen<A, B> implements Generator<A, B> {
   static class ClassNameBuilder {
     private ClassNameBuilder() {}
 
-    static <A, B> BiFunction<A, B, String> className(BiFunction<A, B, String> createClassName) {
-      return createClassName;
+    static <A, B> BiFunction<A, B, String> className(BiFunction<A, B, Object> createClassName) {
+      return (data, settings) -> createClassName.apply(data, settings).toString();
     }
 
-    static <A, B> BiFunction<A, B, String> className(Function<A, String> className) {
-      return (data, settings) -> className.apply(data);
+    static <A, B> BiFunction<A, B, String> className(Function<A, Object> className) {
+      return (data, settings) -> className.apply(data).toString();
     }
 
     static <A, B> BiFunction<A, B, String> className(String className) {

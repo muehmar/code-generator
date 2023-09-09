@@ -4,24 +4,36 @@ import static io.github.muehmar.codegenerator.writer.Writer.javaWriter;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import ch.bluecare.commons.data.PList;
+import lombok.Value;
 import org.junit.jupiter.api.Test;
 
 class ConstructorGenTest {
   @Test
   void generate_when_minimalGeneratorCreated_then_outputCorrect() {
-    final ConstructorGen<PList<String>, Void> generator =
-        ConstructorGenBuilder.<PList<String>, Void>create()
+    final ConstructorGen<Data, Void> generator =
+        ConstructorGenBuilder.<Data, Void>create()
             .modifiers(JavaModifier.PUBLIC)
-            .className(l -> l.apply(0))
-            .arguments(l -> l.drop(1))
+            .className(Data::getClassname)
+            .arguments(Data::getArguments)
             .content("System.out.println(\"Hello World\");")
             .build();
 
-    final PList<String> data = PList.of("Customer", "String a", "int b");
+    final Data data =
+        new Data(
+            "Customer",
+            PList.of(
+                new ConstructorGen.Argument("String", "a"),
+                new ConstructorGen.Argument("int", "b")));
 
     final String output = generator.generate(data, null, javaWriter()).asString();
     assertEquals(
         "public Customer(String a, int b) {\n" + "  System.out.println(\"Hello World\");\n" + "}",
         output);
+  }
+
+  @Value
+  private static class Data {
+    String classname;
+    PList<ConstructorGen.Argument> arguments;
   }
 }

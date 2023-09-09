@@ -9,22 +9,27 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import ch.bluecare.commons.data.PList;
 import io.github.muehmar.codegenerator.writer.Writer;
+import lombok.Value;
 import org.junit.jupiter.api.Test;
 
 class MethodGenTest {
   @Test
   void generate_when_minimalGeneratorCreated_then_outputCorrect() {
-    final MethodGen<PList<String>, Void> generator =
-        MethodGenBuilder.<PList<String>, Void>create()
+    final MethodGen<Data, Void> generator =
+        MethodGenBuilder.<Data, Void>create()
             .modifiers(PUBLIC, FINAL)
             .noGenericTypes()
-            .returnType(l -> l.apply(0))
-            .methodName(l -> l.apply(1))
-            .arguments(l -> l.drop(2))
+            .returnType(Data::getReturnType)
+            .methodName(Data::getMethodName)
+            .arguments(Data::getArguments)
             .contentWriter(w -> w.println("System.out.println(\"Hello World\");"))
             .build();
 
-    final PList<String> data = PList.of("void", "getXY", "String a", "int b");
+    final Data data =
+        new Data(
+            "void",
+            "getXY",
+            PList.of(new MethodGen.Argument("String", "a"), new MethodGen.Argument("int", "b")));
 
     final String output = generator.generate(data, noSettings(), javaWriter()).asString();
     assertEquals(
@@ -42,7 +47,7 @@ class MethodGenTest {
             .genericTypes("T, S")
             .returnType("T")
             .methodName("doSomething")
-            .singleArgument(ignore -> "S s")
+            .singleArgument(ignore -> new MethodGen.Argument("S", "s"))
             .contentWriter(w -> w.println("return s.getT();"))
             .build();
 
@@ -68,5 +73,12 @@ class MethodGenTest {
         "public final returnSomething doSomething() {\n" + "  return xyz;\n" + "}",
         writer.asString());
     assertTrue(writer.getRefs().exists("somethingRef"::equals));
+  }
+
+  @Value
+  private static class Data {
+    String returnType;
+    String methodName;
+    PList<MethodGen.Argument> arguments;
   }
 }
