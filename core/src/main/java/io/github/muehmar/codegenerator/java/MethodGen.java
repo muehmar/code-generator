@@ -217,5 +217,21 @@ public class MethodGen<A, B> implements Generator<A, B> {
   public static class Argument {
     String type;
     String name;
+
+    public static Argument argument(String type, String name) {
+      return new Argument(type, name);
+    }
+
+    public static Argument argument(String type, Object name) {
+      return new Argument(type, name.toString());
+    }
+
+    public static Argument argument(Object type, String name) {
+      return new Argument(type.toString(), name);
+    }
+
+    public static Argument argument(Object type, Object name) {
+      return new Argument(type.toString(), name.toString());
+    }
   }
 }
