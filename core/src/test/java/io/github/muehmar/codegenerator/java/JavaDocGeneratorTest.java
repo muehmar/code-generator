@@ -25,9 +25,9 @@ class JavaDocGeneratorTest {
 
     assertEquals(
         "/**\n"
-            + " * This is some javadoc\n"
-            + " *  1. Line one\n"
-            + " *  2. Line two\n"
+            + " * This is some javadoc<br>\n"
+            + " *  1. Line one<br>\n"
+            + " *  2. Line two<br>\n"
             + " *  3. This is a very long line! This is a very long line! This is a very long\n"
             + " * line! This is a very long line! This is a very long line! This is a very long\n"
             + " * line! This is a very long line! This is a very long line! This is a very long\n"
@@ -92,6 +92,27 @@ class JavaDocGeneratorTest {
     assertEquals(
         "/**\n"
             + " * LooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooongWord\n"
+            + " */",
+        output);
+  }
+
+  @Test
+  void javaDoc_when_doubleLineBreak_then_keepLineBreaksAndAddBreakTag() {
+    final Generator<String, Void> generator = JavaDocGenerator.javaDoc();
+
+    final String output =
+        generator
+            .generate(
+                "This is a line followed by a double line break\n\nThe line that follows",
+                noSettings(),
+                javaWriter())
+            .asString();
+
+    assertEquals(
+        "/**\n"
+            + " * This is a line followed by a double line break<br>\n"
+            + " * <br>\n"
+            + " * The line that follows\n"
             + " */",
         output);
   }

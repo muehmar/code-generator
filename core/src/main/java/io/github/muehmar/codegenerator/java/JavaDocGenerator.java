@@ -27,11 +27,15 @@ public class JavaDocGenerator {
   }
 
   private static <B> Generator<String, B> content() {
-    return (input, ign, writer) ->
-        PList.fromArray(input.split("\n"))
-            .flatMap(JavaDocGenerator::autoNewline)
-            .map(line -> " * " + line)
-            .foldLeft(writer, Writer::println);
+    return (input, ign, writer) -> {
+      final String[] lines = input.split("\n");
+      return PList.fromArray(lines)
+          .zipWithIndex()
+          .map(p -> lines.length == p.second() + 1 ? p.first() : p.first().concat("<br>"))
+          .flatMap(JavaDocGenerator::autoNewline)
+          .map(line -> " * " + line)
+          .foldLeft(writer, Writer::println);
+    };
   }
 
   private static PList<String> autoNewline(String line) {
