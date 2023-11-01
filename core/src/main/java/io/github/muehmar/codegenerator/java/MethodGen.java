@@ -134,11 +134,7 @@ public class MethodGen<A, B> implements Generator<A, B> {
       return gen;
     }
 
-    static <A, B> Generator<A, B> returnType(Function<A, String> createReturnType) {
-      return (data, settings, w) -> w.println(createReturnType.apply(data));
-    }
-
-    static <A, B> Generator<A, B> returnTypeName(Function<A, Object> createReturnType) {
+    static <A, B> Generator<A, B> returnType(Function<A, Object> createReturnType) {
       return (d, s, w) -> w.println(createReturnType.apply(d).toString());
     }
 

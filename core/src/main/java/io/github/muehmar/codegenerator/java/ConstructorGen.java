@@ -170,11 +170,11 @@ public class ConstructorGen<A, B> implements Generator<A, B> {
       return new Argument(type.toString(), name);
     }
 
-public static Argument argument(String type, Object name) {
+    public static Argument argument(String type, Object name) {
       return new Argument(type, name.toString());
     }
 
-public static Argument argument(Object type, Object name) {
+    public static Argument argument(Object type, Object name) {
       return new Argument(type.toString(), name.toString());
     }
   }
