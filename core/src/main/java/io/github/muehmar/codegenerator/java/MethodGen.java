@@ -22,6 +22,7 @@ public class MethodGen<A, B> implements Generator<A, B> {
   private final Generator<A, B> createReturnType;
   private final BiFunction<A, B, String> createMethodName;
   private final BiFunction<A, B, PList<Argument>> createArguments;
+  private final Generator<A, B> createThrownExceptions;
   private final Optional<Generator<A, B>> contentGenerator;
 
   MethodGen(
@@ -30,12 +31,14 @@ public class MethodGen<A, B> implements Generator<A, B> {
       Generator<A, B> createReturnType,
       BiFunction<A, B, String> createMethodName,
       BiFunction<A, B, PList<Argument>> createArguments,
+      Generator<A, B> createThrownExceptions,
       Optional<Generator<A, B>> contentGenerator) {
     this.createModifiers = createModifiers;
     this.createGenericTypeParameters = createGenericTypeParameters;
     this.createReturnType = createReturnType;
     this.createMethodName = createMethodName;
     this.createArguments = createArguments;
+    this.createThrownExceptions = createThrownExceptions;
     this.contentGenerator = contentGenerator;
   }
 
@@ -55,16 +58,23 @@ public class MethodGen<A, B> implements Generator<A, B> {
                       .apply(data, settings)
                       .map(arg -> String.format("%s %s", arg.type, arg.name))
                       .mkString(", ");
+              final Writer exceptionsWriter =
+                  createThrownExceptions.generate(data, settings, javaWriter());
+              final String exceptions = exceptionsWriter.asString();
+              final String throwsDeclaration =
+                  Strings.surroundIfNotEmpty(" throws ", exceptions.trim(), "");
               final String openingBracket = contentGenerator.isPresent() ? " {" : ";";
               return w.print(
-                      "%s%s%s %s(%s)%s",
+                      "%s%s%s %s(%s)%s%s",
                       modifiers.asStringTrailingWhitespace(),
                       genericTypeParameters,
                       returnTypeWriter.asString(),
                       methodName,
                       arguments,
+                      throwsDeclaration,
                       openingBracket)
-                  .refs(returnTypeWriter.getRefs());
+                  .refs(returnTypeWriter.getRefs())
+                  .refs(exceptionsWriter.getRefs());
             })
         .append(contentGenerator.orElse(Generator.emptyGen()), 1)
         .append(w -> contentGenerator.isPresent() ? w.println("}") : w)
@@ -181,6 +191,31 @@ public class MethodGen<A, B> implements Generator<A, B> {
 
     static <A, B> BiFunction<A, B, PList<Argument>> noArguments() {
       return (d, s) -> PList.empty();
+    }
+  }
+
+  @FieldBuilder(fieldName = "createThrownExceptions", disableDefaultMethods = true)
+  static class ThrowsBuilder {
+    private ThrowsBuilder() {}
+
+    static <A, B> Generator<A, B> throwsExceptions(Generator<A, B> createThrows) {
+      return createThrows;
+    }
+
+    static <A, B> Generator<A, B> throwsExceptions(BiFunction<A, B, PList<?>> createThrows) {
+      return (d, s, w) -> w.println(createThrows.apply(d, s).map(Object::toString).mkString(", "));
+    }
+
+    static <A, B> Generator<A, B> throwsExceptions(Function<A, PList<?>> createThrows) {
+      return throwsExceptions((d, s) -> createThrows.apply(d));
+    }
+
+    static <A, B> Generator<A, B> throwsSingleException(Function<A, ?> createThrows) {
+      return throwsExceptions((d, s) -> PList.single(createThrows.apply(d)));
+    }
+
+    static <A, B> Generator<A, B> doesNotThrow() {
+      return Generator.emptyGen();
     }
   }
 

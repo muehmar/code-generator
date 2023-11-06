@@ -22,6 +22,7 @@ class MethodGenTest {
             .returnType(Data::getReturnType)
             .methodName(Data::getMethodName)
             .arguments(Data::getArguments)
+            .doesNotThrow()
             .contentWriter(w -> w.println("System.out.println(\"Hello World\");"))
             .build();
 
@@ -48,12 +49,39 @@ class MethodGenTest {
             .returnType("T")
             .methodName("doSomething")
             .singleArgument(ignore -> new MethodGen.Argument("S", "s"))
+            .throwsExceptions(ignore -> PList.of("IllegalStateException", "IOException"))
             .contentWriter(w -> w.println("return s.getT();"))
             .build();
 
     final String output = generator.generate("data", noSettings(), javaWriter()).asString();
     assertEquals(
-        "public final <T, S> T doSomething(S s) {\n" + "  return s.getT();\n" + "}", output);
+        "public final <T, S> T doSomething(S s) throws IllegalStateException, IOException {\n"
+            + "  return s.getT();\n"
+            + "}",
+        output);
+  }
+
+  @Test
+  void generate_when_methodWithExceptionsGenerator_then_outputCorrect() {
+    final MethodGen<String, Void> generator =
+        MethodGenBuilder.<String, Void>create()
+            .modifiers(PUBLIC, FINAL)
+            .genericTypes("T, S")
+            .returnType("T")
+            .methodName("doSomething")
+            .singleArgument(ignore -> new MethodGen.Argument("S", "s"))
+            .throwsExceptions(
+                (d, s, w) -> w.println("CustomException").ref("io.github.muehmar.CustomException"))
+            .contentWriter(w -> w.println("return s.getT();"))
+            .build();
+
+    final Writer writer = generator.generate("data", noSettings(), javaWriter());
+    assertEquals(
+        "public final <T, S> T doSomething(S s) throws CustomException {\n"
+            + "  return s.getT();\n"
+            + "}",
+        writer.asString());
+    assertEquals(PList.single("io.github.muehmar.CustomException"), writer.getRefs());
   }
 
   @Test
@@ -65,6 +93,7 @@ class MethodGenTest {
             .returnType((d, s, w) -> w.println("returnSomething").ref("somethingRef"))
             .methodName("doSomething")
             .noArguments()
+            .doesNotThrow()
             .contentWriter(w -> w.println("return xyz;"))
             .build();
 
