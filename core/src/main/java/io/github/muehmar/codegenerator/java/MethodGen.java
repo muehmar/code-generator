@@ -157,12 +157,12 @@ public class MethodGen<A, B> implements Generator<A, B> {
   static class MethodNameBuilder {
     private MethodNameBuilder() {}
 
-    static <A, B> BiFunction<A, B, String> methodName(BiFunction<A, B, String> methodName) {
-      return methodName;
+    static <A, B> BiFunction<A, B, String> methodName(BiFunction<A, B, Object> methodName) {
+      return (data, settings) -> methodName.apply(data, settings).toString();
     }
 
-    static <A, B> BiFunction<A, B, String> methodName(Function<A, String> methodName) {
-      return (data, settings) -> methodName.apply(data);
+    static <A, B> BiFunction<A, B, String> methodName(Function<A, Object> methodName) {
+      return (data, settings) -> methodName.apply(data).toString();
     }
 
     static <A, B> BiFunction<A, B, String> methodName(String methodName) {
