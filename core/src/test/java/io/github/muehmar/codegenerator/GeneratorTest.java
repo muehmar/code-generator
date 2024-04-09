@@ -70,6 +70,27 @@ class GeneratorTest {
   }
 
   @Test
+  void appendMappingInput_when_called_then_generatedCorrectAppend() {
+    final Generator<String, Void> genA = constant("genA");
+    final Generator<Integer, Void> genB = (in, settings, writer) -> writer.println(in);
+
+    final Generator<String, Void> gen = genA.append(genB, String::length);
+    final Writer writer = gen.generate("Hello World!", noSettings(), javaWriter());
+    assertEquals("genA\n12", writer.asString());
+  }
+
+  @Test
+  void appendMappingInputWithSettings_when_called_then_generatedCorrectAppend() {
+    final Generator<String, Integer> genA = constant("genA");
+    final Generator<Integer, Integer> genB = (in, settings, writer) -> writer.println(in);
+
+    final Generator<String, Integer> gen =
+        genA.append(genB, (in, settings) -> in.length() + settings);
+    final Writer writer = gen.generate("Hello World!", 10, javaWriter());
+    assertEquals("genA\n22", writer.asString());
+  }
+
+  @Test
   void appendList_when_called_then_contentCreatedForEveryElementInTheList() {
     final Generator<ListData<StringData>, Void> genA = constant("genA");
     final Generator<StringData, Void> fieldGen =

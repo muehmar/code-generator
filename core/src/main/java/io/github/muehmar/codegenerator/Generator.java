@@ -3,6 +3,7 @@ package io.github.muehmar.codegenerator;
 import ch.bluecare.commons.data.PList;
 import io.github.muehmar.codegenerator.writer.Writer;
 import java.util.Optional;
+import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -119,6 +120,19 @@ public interface Generator<A, B> {
     return (data, settings, writer) -> {
       final Writer selfWriter = self.generate(data, settings, writer);
       return gen.generate(f.apply(data), settings, selfWriter);
+    };
+  }
+
+  /**
+   * Returns a new {@link Generator} which will append the content of the given {@link Generator}
+   * {@code next} to the content of {@code this} while transforming the input data with the given
+   * function {@code f} for the next generator.
+   */
+  default <C> Generator<A, B> append(Generator<C, B> gen, BiFunction<A, B, ? extends C> f) {
+    final Generator<A, B> self = this;
+    return (data, settings, writer) -> {
+      final Writer selfWriter = self.generate(data, settings, writer);
+      return gen.generate(f.apply(data, settings), settings, selfWriter);
     };
   }
 
