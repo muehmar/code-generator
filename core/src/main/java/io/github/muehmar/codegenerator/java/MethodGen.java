@@ -115,7 +115,7 @@ public class MethodGen<A, B> implements Generator<A, B> {
   static class GenericTypeParametersBuilder {
     private GenericTypeParametersBuilder() {}
 
-    static <A, B> BiFunction<A, B, PList<String>> singleGenericType(Function<A, Object> type) {
+    static <A, B> BiFunction<A, B, PList<String>> singleGenericType(Function<A, ?> type) {
       return (data, settings) -> PList.single(type.apply(data)).map(Object::toString);
     }
 
@@ -144,7 +144,7 @@ public class MethodGen<A, B> implements Generator<A, B> {
       return gen;
     }
 
-    static <A, B> Generator<A, B> returnType(Function<A, Object> createReturnType) {
+    static <A, B> Generator<A, B> returnType(Function<A, ?> createReturnType) {
       return (d, s, w) -> w.println(createReturnType.apply(d).toString());
     }
 
@@ -157,11 +157,11 @@ public class MethodGen<A, B> implements Generator<A, B> {
   static class MethodNameBuilder {
     private MethodNameBuilder() {}
 
-    static <A, B> BiFunction<A, B, String> methodName(BiFunction<A, B, Object> methodName) {
+    static <A, B> BiFunction<A, B, String> methodName(BiFunction<A, B, ?> methodName) {
       return (data, settings) -> methodName.apply(data, settings).toString();
     }
 
-    static <A, B> BiFunction<A, B, String> methodName(Function<A, Object> methodName) {
+    static <A, B> BiFunction<A, B, String> methodName(Function<A, ?> methodName) {
       return (data, settings) -> methodName.apply(data).toString();
     }
 
