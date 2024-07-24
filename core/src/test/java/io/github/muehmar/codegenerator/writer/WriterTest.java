@@ -150,4 +150,50 @@ class WriterTest {
             .asString();
     assertEquals("hello\n\nHELLO", output);
   }
+
+  @Test
+  void asString_when_hasMultipleNewLinesAndNoMultipleNewLinesSettings_then_singleNewLine() {
+    final String output =
+        javaWriter().println("Hello").println().println().println("World").asString();
+
+    assertEquals("Hello\n" + "\n" + "World", output);
+  }
+
+  @Test
+  void asString_when_hasMultipleNewLinesAndAllowMultipleNewLinesSettings_then_singleNewLine() {
+    final String output =
+        javaWriter(new WriterSettings(2, false))
+            .println("Hello")
+            .println()
+            .println()
+            .println("World")
+            .asString();
+
+    assertEquals("Hello\n" + "\n" + "\n" + "World", output);
+  }
+
+  @Test
+  void
+      asString_when_newLineBeforeAndAfterRefButNoRefsAndNoMultipleNewLinesSettings_then_singleNewLine() {
+    final String output =
+        javaWriter().println("Hello").println().printRefs().println().println("World").asString();
+
+    assertEquals("Hello\n" + "\n" + "World", output);
+  }
+
+  @Test
+  void
+      asString_when_newLineBeforeAndAfterRefAndNoMultipleNewLinesSettings_then_newLineBeforeAndAfterRefs() {
+    final String output =
+        javaWriter()
+            .println("Hello")
+            .println()
+            .printRefs()
+            .println()
+            .println("World")
+            .ref("ref-123")
+            .asString();
+
+    assertEquals("Hello\n" + "\n" + "import ref-123;\n" + "\n" + "World", output);
+  }
 }

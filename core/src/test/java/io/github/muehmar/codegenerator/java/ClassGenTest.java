@@ -40,12 +40,7 @@ class ClassGenTest {
     final Writer writer =
         generator.generate(new StringData("HelloWorld"), noSettings(), javaWriter());
     assertEquals(
-        "package io.github.muehmar;\n"
-            + "\n"
-            + "\n"
-            + "public class HelloWorld {\n"
-            + "  Content\n"
-            + "}",
+        "package io.github.muehmar;\n" + "\n" + "public class HelloWorld {\n" + "  Content\n" + "}",
         writer.asString());
   }
 
@@ -69,7 +64,6 @@ class ClassGenTest {
         generator.generate(new StringData("HelloWorld"), noSettings(), javaWriter());
     assertEquals(
         "package io.github.muehmar;\n"
-            + "\n"
             + "\n"
             + "/** HelloWorld */\n"
             + "public class HelloWorld {\n"
@@ -99,7 +93,6 @@ class ClassGenTest {
     assertEquals(
         "package io.github.muehmar;\n"
             + "\n"
-            + "\n"
             + "public interface HelloWorld {\n"
             + "  Content\n"
             + "}",
@@ -125,12 +118,7 @@ class ClassGenTest {
     final Writer writer =
         generator.generate(new StringData("HelloWorld"), noSettings(), javaWriter());
     assertEquals(
-        "package io.github.muehmar;\n"
-            + "\n"
-            + "\n"
-            + "public enum HelloWorld {\n"
-            + "  Content\n"
-            + "}",
+        "package io.github.muehmar;\n" + "\n" + "public enum HelloWorld {\n" + "  Content\n" + "}",
         writer.asString());
   }
 
@@ -154,7 +142,6 @@ class ClassGenTest {
         generator.generate(new StringData("HelloWorld"), noSettings(), javaWriter());
     assertEquals(
         "package io.github.muehmar;\n"
-            + "\n"
             + "\n"
             + "public interface HelloWorld extends World {\n"
             + "  Content\n"

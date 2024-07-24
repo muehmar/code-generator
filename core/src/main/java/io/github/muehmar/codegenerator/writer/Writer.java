@@ -3,10 +3,15 @@ package io.github.muehmar.codegenerator.writer;
 import static io.github.muehmar.codegenerator.writer.WriterSettings.defaultSettings;
 
 import ch.bluecare.commons.data.PList;
+import ch.bluecare.commons.data.Pair;
+import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Writer {
   private static final String NEWLINE_STRING = "\n";
 
@@ -19,28 +24,14 @@ public final class Writer {
   private final int tabs;
   private final boolean newline;
 
-  private final RefWriter refWriter;
+  private WriterSettings settings;
 
-  private Writer(
-      PList<String> refs,
-      int refsLineNumber,
-      PList<Line> lines,
-      String tab,
-      int tabs,
-      boolean newline,
-      RefWriter refWriter) {
-    this.refs = refs;
-    this.refsLineNumber = refsLineNumber;
-    this.lines = lines;
-    this.tab = tab;
-    this.tabs = tabs;
-    this.newline = newline;
-    this.refWriter = refWriter;
-  }
+  private final RefWriter refWriter;
 
   public static Writer create(RefWriter refWriter, WriterSettings settings) {
     final String tab = new String(new char[settings.getSpacesPerTab()]).replace("\0", " ");
-    return new Writer(PList.empty(), -1, PList.single(Line.empty()), tab, 0, true, refWriter);
+    return new Writer(
+        PList.empty(), -1, PList.single(Line.empty()), tab, 0, true, settings, refWriter);
   }
 
   public static Writer javaWriter() {
@@ -59,11 +50,11 @@ public final class Writer {
             .map(l -> newline ? l.prepend(createTabs(tabs)) : l)
             .map(l -> this.lines.tail().cons(l))
             .orElse(this.lines);
-    return new Writer(refs, refsLineNumber, newLines, tab, tabs, false, refWriter);
+    return new Writer(refs, refsLineNumber, newLines, tab, tabs, false, settings, refWriter);
   }
 
   public Writer tab(int tabs) {
-    return new Writer(refs, refsLineNumber, lines, tab, tabs, newline, refWriter);
+    return new Writer(refs, refsLineNumber, lines, tab, tabs, newline, settings, refWriter);
   }
 
   public Writer append(Writer other) {
@@ -86,6 +77,7 @@ public final class Writer {
         tab,
         0,
         true,
+        settings,
         refWriter);
   }
 
@@ -98,16 +90,25 @@ public final class Writer {
   }
 
   public Writer empty() {
-    return new Writer(PList.empty(), -1, PList.single(Line.empty()), tab, 0, true, refWriter);
+    return new Writer(
+        PList.empty(), -1, PList.single(Line.empty()), tab, 0, true, settings, refWriter);
   }
 
   public Writer ref(String ref) {
-    return new Writer(refs.cons(ref), refsLineNumber, lines, tab, tabs, newline, refWriter);
+    return new Writer(
+        refs.cons(ref), refsLineNumber, lines, tab, tabs, newline, settings, refWriter);
   }
 
   public Writer refs(Iterable<String> ref) {
     return new Writer(
-        refs.concat(PList.fromIter(ref)), refsLineNumber, lines, tab, tabs, newline, refWriter);
+        refs.concat(PList.fromIter(ref)),
+        refsLineNumber,
+        lines,
+        tab,
+        tabs,
+        newline,
+        settings,
+        refWriter);
   }
 
   public PList<String> getRefs() {
@@ -119,7 +120,8 @@ public final class Writer {
    * {@link Writer#asString()}.
    */
   public Writer printRefs() {
-    return new Writer(refs, lines.size() - (newline ? 1 : 0), lines, tab, tabs, newline, refWriter);
+    return new Writer(
+        refs, lines.size() - (newline ? 1 : 0), lines, tab, tabs, newline, settings, refWriter);
   }
 
   private static String removeTrailingNewlineCharacter(String str) {
@@ -171,7 +173,8 @@ public final class Writer {
   }
 
   public Writer println() {
-    return new Writer(refs, refsLineNumber, lines.cons(Line.empty()), tab, 0, true, refWriter);
+    return new Writer(
+        refs, refsLineNumber, lines.cons(Line.empty()), tab, 0, true, settings, refWriter);
   }
 
   /** Returns the content of this writer as string- */
@@ -183,7 +186,20 @@ public final class Writer {
           sb.append(NEWLINE_STRING);
         };
 
-    final PList<Line> reversedLines = getLinesDroppingLastNewline().reverse();
+    final BiPredicate<Pair<Line, Integer>, Pair<Line, Integer>> consecutiveLineFilter =
+        settings.isNoMultipleNewLines()
+            ? (l1, l2) ->
+                l1.first().nonEmpty()
+                    || l2.first().nonEmpty()
+                    || (l2.second() == refsLineNumber && refs.nonEmpty())
+            : (l1, l2) -> true;
+
+    final PList<Line> reversedLines =
+        getLinesDroppingLastNewline()
+            .reverse()
+            .zipWithIndex()
+            .filterWithPrev(ignore -> true, consecutiveLineFilter)
+            .map(Pair::first);
     reversedLines.take(Math.max(refsLineNumber, 0)).forEach(applyStringBuilder);
 
     if (refsLineNumber >= 0) {
