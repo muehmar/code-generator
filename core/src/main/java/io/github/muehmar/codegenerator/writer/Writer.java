@@ -4,6 +4,7 @@ import static io.github.muehmar.codegenerator.writer.WriterSettings.defaultSetti
 
 import ch.bluecare.commons.data.PList;
 import ch.bluecare.commons.data.Pair;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -175,6 +176,25 @@ public final class Writer {
   public Writer println() {
     return new Writer(
         refs, refsLineNumber, lines.cons(Line.empty()), tab, 0, true, settings, refWriter);
+  }
+
+  /**
+   * Removes any trailing empty lines, i.e. this method is called and print statement will add the
+   * content directly to the last non empty line.
+   */
+  public Writer resetToLastNotEmptyLine() {
+    final AtomicBoolean nonEmptyFound = new AtomicBoolean(false);
+    final PList<Line> filteredLines =
+        lines.filter(
+            line -> {
+              if (line.nonEmpty() || nonEmptyFound.get()) {
+                nonEmptyFound.set(true);
+                return true;
+              } else {
+                return false;
+              }
+            });
+    return new Writer(refs, refsLineNumber, filteredLines, tab, tabs, false, settings, refWriter);
   }
 
   /** Returns the content of this writer as string- */

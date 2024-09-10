@@ -196,4 +196,19 @@ class WriterTest {
 
     assertEquals("Hello\n" + "\n" + "import ref-123;\n" + "\n" + "World", output);
   }
+
+  @Test
+  void resetToLastNonEmptyLine_when_called_then_followingPrintStatementsAddToLastNonEmptyLine() {
+    final String output =
+        javaWriter()
+            .println("Hello")
+            .println()
+            .println("World")
+            .println()
+            .resetToLastNotEmptyLine()
+            .println("!")
+            .asString();
+
+    assertEquals("Hello\n\nWorld!", output);
+  }
 }
