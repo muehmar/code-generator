@@ -4,8 +4,7 @@ import static io.github.muehmar.codegenerator.TestSettings.noSettings;
 import static io.github.muehmar.codegenerator.java.JavaModifier.FINAL;
 import static io.github.muehmar.codegenerator.java.JavaModifier.PUBLIC;
 import static io.github.muehmar.codegenerator.writer.Writer.javaWriter;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import ch.bluecare.commons.data.PList;
 import io.github.muehmar.codegenerator.writer.Writer;
@@ -33,11 +32,11 @@ class MethodGenTest {
             PList.of(new MethodGen.Argument("String", "a"), new MethodGen.Argument("int", "b")));
 
     final String output = generator.generate(data, noSettings(), javaWriter()).asString();
-    assertEquals(
-        "public final void getXY(String a, int b) {\n"
-            + "  System.out.println(\"Hello World\");\n"
-            + "}",
-        output);
+    assertThat(output)
+        .isEqualTo(
+            "public final void getXY(String a, int b) {\n"
+                + "  System.out.println(\"Hello World\");\n"
+                + "}");
   }
 
   @Test
@@ -54,11 +53,11 @@ class MethodGenTest {
             .build();
 
     final String output = generator.generate("data", noSettings(), javaWriter()).asString();
-    assertEquals(
-        "public final <T, S> T doSomething(S s) throws IllegalStateException, IOException {\n"
-            + "  return s.getT();\n"
-            + "}",
-        output);
+    assertThat(output)
+        .isEqualTo(
+            "public final <T, S> T doSomething(S s) throws IllegalStateException, IOException {\n"
+                + "  return s.getT();\n"
+                + "}");
   }
 
   @Test
@@ -76,12 +75,12 @@ class MethodGenTest {
             .build();
 
     final Writer writer = generator.generate("data", noSettings(), javaWriter());
-    assertEquals(
-        "public final <T, S> T doSomething(S s) throws CustomException {\n"
-            + "  return s.getT();\n"
-            + "}",
-        writer.asString());
-    assertEquals(PList.single("io.github.muehmar.CustomException"), writer.getRefs());
+    assertThat(writer.asString())
+        .isEqualTo(
+            "public final <T, S> T doSomething(S s) throws CustomException {\n"
+                + "  return s.getT();\n"
+                + "}");
+    assertThat(writer.getRefs()).isEqualTo(PList.single("io.github.muehmar.CustomException"));
   }
 
   @Test
@@ -98,10 +97,9 @@ class MethodGenTest {
             .build();
 
     final Writer writer = generator.generate("data", noSettings(), javaWriter());
-    assertEquals(
-        "public final returnSomething doSomething() {\n" + "  return xyz;\n" + "}",
-        writer.asString());
-    assertTrue(writer.getRefs().exists("somethingRef"::equals));
+    assertThat(writer.asString())
+        .isEqualTo("public final returnSomething doSomething() {\n" + "  return xyz;\n" + "}");
+    assertThat(writer.getRefs().exists("somethingRef"::equals)).isTrue();
   }
 
   @Value

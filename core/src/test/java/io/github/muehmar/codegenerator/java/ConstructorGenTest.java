@@ -1,7 +1,7 @@
 package io.github.muehmar.codegenerator.java;
 
 import static io.github.muehmar.codegenerator.writer.Writer.javaWriter;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import ch.bluecare.commons.data.PList;
 import lombok.Value;
@@ -26,9 +26,11 @@ class ConstructorGenTest {
                 new ConstructorGen.Argument("int", "b")));
 
     final String output = generator.generate(data, null, javaWriter()).asString();
-    assertEquals(
-        "public Customer(String a, int b) {\n" + "  System.out.println(\"Hello World\");\n" + "}",
-        output);
+    assertThat(output)
+        .isEqualTo(
+            "public Customer(String a, int b) {\n"
+                + "  System.out.println(\"Hello World\");\n"
+                + "}");
   }
 
   @Value

@@ -2,7 +2,7 @@ package io.github.muehmar.codegenerator.java;
 
 import static io.github.muehmar.codegenerator.TestSettings.noSettings;
 import static io.github.muehmar.codegenerator.writer.Writer.javaWriter;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import ch.bluecare.commons.data.PList;
 import io.github.muehmar.codegenerator.Generator;
@@ -39,9 +39,13 @@ class ClassGenTest {
 
     final Writer writer =
         generator.generate(new StringData("HelloWorld"), noSettings(), javaWriter());
-    assertEquals(
-        "package io.github.muehmar;\n" + "\n" + "public class HelloWorld {\n" + "  Content\n" + "}",
-        writer.asString());
+    assertThat(writer.asString())
+        .isEqualTo(
+            "package io.github.muehmar;\n"
+                + "\n"
+                + "public class HelloWorld {\n"
+                + "  Content\n"
+                + "}");
   }
 
   @Test
@@ -62,14 +66,14 @@ class ClassGenTest {
 
     final Writer writer =
         generator.generate(new StringData("HelloWorld"), noSettings(), javaWriter());
-    assertEquals(
-        "package io.github.muehmar;\n"
-            + "\n"
-            + "/** HelloWorld */\n"
-            + "public class HelloWorld {\n"
-            + "  Content\n"
-            + "}",
-        writer.asString());
+    assertThat(writer.asString())
+        .isEqualTo(
+            "package io.github.muehmar;\n"
+                + "\n"
+                + "/** HelloWorld */\n"
+                + "public class HelloWorld {\n"
+                + "  Content\n"
+                + "}");
   }
 
   @Test
@@ -90,13 +94,13 @@ class ClassGenTest {
 
     final Writer writer =
         generator.generate(new StringData("HelloWorld"), noSettings(), javaWriter());
-    assertEquals(
-        "package io.github.muehmar;\n"
-            + "\n"
-            + "public interface HelloWorld {\n"
-            + "  Content\n"
-            + "}",
-        writer.asString());
+    assertThat(writer.asString())
+        .isEqualTo(
+            "package io.github.muehmar;\n"
+                + "\n"
+                + "public interface HelloWorld {\n"
+                + "  Content\n"
+                + "}");
   }
 
   @Test
@@ -117,9 +121,13 @@ class ClassGenTest {
 
     final Writer writer =
         generator.generate(new StringData("HelloWorld"), noSettings(), javaWriter());
-    assertEquals(
-        "package io.github.muehmar;\n" + "\n" + "public enum HelloWorld {\n" + "  Content\n" + "}",
-        writer.asString());
+    assertThat(writer.asString())
+        .isEqualTo(
+            "package io.github.muehmar;\n"
+                + "\n"
+                + "public enum HelloWorld {\n"
+                + "  Content\n"
+                + "}");
   }
 
   @Test
@@ -140,13 +148,13 @@ class ClassGenTest {
 
     final Writer writer =
         generator.generate(new StringData("HelloWorld"), noSettings(), javaWriter());
-    assertEquals(
-        "package io.github.muehmar;\n"
-            + "\n"
-            + "public interface HelloWorld extends World {\n"
-            + "  Content\n"
-            + "}",
-        writer.asString());
+    assertThat(writer.asString())
+        .isEqualTo(
+            "package io.github.muehmar;\n"
+                + "\n"
+                + "public interface HelloWorld extends World {\n"
+                + "  Content\n"
+                + "}");
   }
 
   @Test
@@ -167,14 +175,14 @@ class ClassGenTest {
 
     final Writer writer =
         generator.generate(new StringData("HelloWorld"), noSettings(), javaWriter());
-    assertEquals(
-        "package io.github.muehmar;\n"
-            + "\n"
-            + "import java.util.Optional;\n"
-            + "\n"
-            + "public class HelloWorld {\n"
-            + "}",
-        writer.asString());
+    assertThat(writer.asString())
+        .isEqualTo(
+            "package io.github.muehmar;\n"
+                + "\n"
+                + "import java.util.Optional;\n"
+                + "\n"
+                + "public class HelloWorld {\n"
+                + "}");
   }
 
   @Test
@@ -195,7 +203,7 @@ class ClassGenTest {
 
     final Writer writer =
         generator.generate(new StringData("HelloWorld"), noSettings(), javaWriter());
-    assertEquals("public class HelloWorld {\n" + "}", writer.asString());
+    assertThat(writer.asString()).isEqualTo("public class HelloWorld {\n" + "}");
   }
 
   @ParameterizedTest
@@ -218,7 +226,7 @@ class ClassGenTest {
 
     final Writer writer =
         generator.generate(new StringData("HelloWorld"), noSettings(), javaWriter());
-    assertEquals("public final class HelloWorld {\n" + "}", writer.asString());
+    assertThat(writer.asString()).isEqualTo("public final class HelloWorld {\n" + "}");
   }
 
   @Test
@@ -239,7 +247,7 @@ class ClassGenTest {
 
     final Writer writer =
         generator.generate(new StringData("HelloWorld"), noSettings(), javaWriter());
-    assertEquals("public class HelloWorld extends Superclass {\n" + "}", writer.asString());
+    assertThat(writer.asString()).isEqualTo("public class HelloWorld extends Superclass {\n" + "}");
   }
 
   @Test
@@ -260,8 +268,8 @@ class ClassGenTest {
 
     final Writer writer =
         generator.generate(TestData.stringListData("Hello", "World"), noSettings(), javaWriter());
-    assertEquals(
-        "public class Hello extends Superclass implements World {\n" + "}", writer.asString());
+    assertThat(writer.asString())
+        .isEqualTo("public class Hello extends Superclass implements World {\n" + "}");
   }
 
   @Test
@@ -285,7 +293,8 @@ class ClassGenTest {
 
     final Writer writer =
         generator.generate(TestData.stringListData("Hello", "World"), noSettings(), javaWriter());
-    assertEquals("@Hello\n" + "@World\n" + "public class Hello {\n" + "}", writer.asString());
+    assertThat(writer.asString())
+        .isEqualTo("@Hello\n" + "@World\n" + "public class Hello {\n" + "}");
   }
 
   private static Stream<Arguments> publicAndFinalModifierUnordered() {
