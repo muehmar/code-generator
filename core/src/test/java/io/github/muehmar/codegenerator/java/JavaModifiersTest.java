@@ -1,6 +1,6 @@
 package io.github.muehmar.codegenerator.java;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import ch.bluecare.commons.data.PList;
 import java.util.stream.Stream;
@@ -16,7 +16,7 @@ class JavaModifiersTest {
   void
       asString_when_privateStaticFinalModifiersMultipleTimesAndDifferentOrder_then_singleOccurenceAndCorrectOrder(
           PList<JavaModifier> modifiers) {
-    assertEquals("private static final", JavaModifiers.of(modifiers).asString());
+    assertThat(JavaModifiers.of(modifiers).asString()).isEqualTo("private static final");
   }
 
   private static Stream<Arguments> privateStaticFinalModifiersMultipleTimesAndDifferentOrder() {
@@ -39,12 +39,12 @@ class JavaModifiersTest {
   @Test
   void asStringTrailingWhiteSpace_when_noModifiers_then_outputEmpty() {
     final JavaModifiers modifiers = JavaModifiers.of();
-    assertEquals("", modifiers.asStringTrailingWhitespace());
+    assertThat(modifiers.asStringTrailingWhitespace()).isEqualTo("");
   }
 
   @Test
   void asStringTrailingWhiteSpace_when_atLeastOneModifier_then_outputWithTrailingWhitespace() {
     final JavaModifiers modifiers = JavaModifiers.of(JavaModifier.PRIVATE);
-    assertEquals("private ", modifiers.asStringTrailingWhitespace());
+    assertThat(modifiers.asStringTrailingWhitespace()).isEqualTo("private ");
   }
 }

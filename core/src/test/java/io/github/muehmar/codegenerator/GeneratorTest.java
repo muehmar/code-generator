@@ -6,7 +6,7 @@ import static io.github.muehmar.codegenerator.TestData.booleanData;
 import static io.github.muehmar.codegenerator.TestData.noData;
 import static io.github.muehmar.codegenerator.TestSettings.noSettings;
 import static io.github.muehmar.codegenerator.writer.Writer.javaWriter;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import ch.bluecare.commons.data.PList;
 import io.github.muehmar.codegenerator.TestData.BooleanData;
@@ -23,21 +23,21 @@ class GeneratorTest {
   void constant_when_created_then_correctOutput() {
     final Generator<Void, Void> gen = constant("Hello World!");
     final Writer writer = gen.generate(noData(), noSettings(), javaWriter());
-    assertEquals("Hello World!", writer.asString());
+    assertThat(writer.asString()).isEqualTo("Hello World!");
   }
 
   @Test
   void constant_when_formatArguments_then_correctOutput() {
     final Generator<Void, Void> gen = constant("Hello %s!", "World");
     final Writer writer = gen.generate(noData(), noSettings(), javaWriter());
-    assertEquals("Hello World!", writer.asString());
+    assertThat(writer.asString()).isEqualTo("Hello World!");
   }
 
   @Test
   void ofWriterFunction_when_created_then_correctOutput() {
     final Generator<Void, Void> gen = ofWriterFunction(w -> w.println("Hello World!"));
     final Writer writer = gen.generate(noData(), noSettings(), javaWriter());
-    assertEquals("Hello World!", writer.asString());
+    assertThat(writer.asString()).isEqualTo("Hello World!");
   }
 
   @Test
@@ -47,7 +47,7 @@ class GeneratorTest {
 
     final Generator<Void, Void> gen = genA.append(genB);
     final Writer writer = gen.generate(noData(), noSettings(), javaWriter());
-    assertEquals("genA\ngenB", writer.asString());
+    assertThat(writer.asString()).isEqualTo("genA\ngenB");
   }
 
   @Test
@@ -57,7 +57,7 @@ class GeneratorTest {
 
     final Generator<Void, Void> gen = genA.append(genB, 2);
     final Writer writer = gen.generate(noData(), noSettings(), javaWriter());
-    assertEquals("genA\n    genB", writer.asString());
+    assertThat(writer.asString()).isEqualTo("genA\n    genB");
   }
 
   @Test
@@ -66,7 +66,7 @@ class GeneratorTest {
 
     final Generator<Void, Void> gen = genA.append(w -> w.println("appended"));
     final Writer writer = gen.generate(noData(), noSettings(), javaWriter());
-    assertEquals("genA\nappended", writer.asString());
+    assertThat(writer.asString()).isEqualTo("genA\nappended");
   }
 
   @Test
@@ -76,7 +76,7 @@ class GeneratorTest {
 
     final Generator<String, Void> gen = genA.append(genB, String::length);
     final Writer writer = gen.generate("Hello World!", noSettings(), javaWriter());
-    assertEquals("genA\n12", writer.asString());
+    assertThat(writer.asString()).isEqualTo("genA\n12");
   }
 
   @Test
@@ -87,7 +87,7 @@ class GeneratorTest {
     final Generator<String, Integer> gen =
         genA.append(genB, (in, settings) -> in.length() + settings);
     final Writer writer = gen.generate("Hello World!", 10, javaWriter());
-    assertEquals("genA\n22", writer.asString());
+    assertThat(writer.asString()).isEqualTo("genA\n22");
   }
 
   @Test
@@ -102,7 +102,7 @@ class GeneratorTest {
         genA.appendList(fieldGen, ListData::getList);
     final Writer writer = generator.generate(data, noSettings(), javaWriter());
 
-    assertEquals("genA\nid\nusername\nnickname", writer.asString());
+    assertThat(writer.asString()).isEqualTo("genA\nid\nusername\nnickname");
   }
 
   @Test
@@ -117,7 +117,7 @@ class GeneratorTest {
         genA.appendList(fieldGen, ListData::getList, ofWriterFunction(Writer::println));
     final Writer writer = generator.generate(data, noSettings(), javaWriter());
 
-    assertEquals("genA\nid\n\nusername\n\nnickname", writer.asString());
+    assertThat(writer.asString()).isEqualTo("genA\nid\n\nusername\n\nnickname");
   }
 
   @Test
@@ -132,7 +132,7 @@ class GeneratorTest {
         genA.appendList(fieldGen, ignore -> PList.empty(), ofWriterFunction(Writer::println));
     final Writer writer = generator.generate(data, noSettings(), javaWriter());
 
-    assertEquals("genA", writer.asString());
+    assertThat(writer.asString()).isEqualTo("genA");
   }
 
   @Test
@@ -144,7 +144,7 @@ class GeneratorTest {
         genA.appendOptional(genB, Function.identity());
     final Writer writer = generator.generate(Optional.of("data"), noSettings(), javaWriter());
 
-    assertEquals("genA\n-> data", writer.asString());
+    assertThat(writer.asString()).isEqualTo("genA\n-> data");
   }
 
   @Test
@@ -156,7 +156,7 @@ class GeneratorTest {
         genA.appendOptional(genB, Function.identity());
     final Writer writer = generator.generate(Optional.empty(), noSettings(), javaWriter());
 
-    assertEquals("genA", writer.asString());
+    assertThat(writer.asString()).isEqualTo("genA");
   }
 
   @Test
@@ -168,7 +168,7 @@ class GeneratorTest {
         genA.appendConditionally(genB, BooleanData::isFlag);
     final Writer writer = generator.generate(booleanData(true), noSettings(), javaWriter());
 
-    assertEquals("genA\ngenB", writer.asString());
+    assertThat(writer.asString()).isEqualTo("genA\ngenB");
   }
 
   @Test
@@ -180,7 +180,7 @@ class GeneratorTest {
         genA.appendConditionally(genB, BooleanData::isFlag);
     final Writer writer = generator.generate(booleanData(false), noSettings(), javaWriter());
 
-    assertEquals("genA", writer.asString());
+    assertThat(writer.asString()).isEqualTo("genA");
   }
 
   @Test
@@ -191,7 +191,7 @@ class GeneratorTest {
 
     final Writer writer = generator.generate(1, 2, javaWriter());
 
-    assertEquals("genA", writer.asString());
+    assertThat(writer.asString()).isEqualTo("genA");
   }
 
   @Test
@@ -202,7 +202,7 @@ class GeneratorTest {
 
     final Writer writer = generator.generate(2, 2, javaWriter());
 
-    assertEquals("", writer.asString());
+    assertThat(writer.asString()).isEqualTo("");
   }
 
   @Test
@@ -214,7 +214,7 @@ class GeneratorTest {
             .appendSingleBlankLine()
             .generate(noData(), noSettings(), javaWriter());
 
-    assertEquals("genA\n", writer.asString());
+    assertThat(writer.asString()).isEqualTo("genA\n");
   }
 
   @Test
@@ -223,7 +223,7 @@ class GeneratorTest {
 
     final Writer writer = genA.appendNewLine().generate(noData(), noSettings(), javaWriter());
 
-    assertEquals("genA\n", writer.asString());
+    assertThat(writer.asString()).isEqualTo("genA\n");
   }
 
   @Test
@@ -232,7 +232,7 @@ class GeneratorTest {
 
     final Writer writer = genA.prependNewLine().generate(noData(), noSettings(), javaWriter());
 
-    assertEquals("\ngenA", writer.asString());
+    assertThat(writer.asString()).isEqualTo("\ngenA");
   }
 
   @Test
@@ -241,7 +241,7 @@ class GeneratorTest {
 
     final Writer writer = genA.indent(2).generate(noData(), noSettings(), javaWriter());
 
-    assertEquals("    genA", writer.asString());
+    assertThat(writer.asString()).isEqualTo("    genA");
   }
 
   @Test
@@ -252,6 +252,6 @@ class GeneratorTest {
 
     final Writer writer = generator.generate(255, noSettings(), javaWriter());
 
-    assertEquals("ff", writer.asString());
+    assertThat(writer.asString()).isEqualTo("ff");
   }
 }

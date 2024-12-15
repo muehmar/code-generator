@@ -1,7 +1,7 @@
 package io.github.muehmar.codegenerator.writer;
 
 import static io.github.muehmar.codegenerator.writer.Writer.javaWriter;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
 
@@ -9,13 +9,13 @@ class WriterTest {
   @Test
   void print_when_formatStringWithArgs_then_formattedCorrectly() {
     final Writer writer = javaWriter().print("Format %s and %s!", "this", "that");
-    assertEquals("Format this and that!", writer.asString());
+    assertThat(writer.asString()).isEqualTo("Format this and that!");
   }
 
   @Test
   void tabAndPrint_when_tabAndFormatStringWithArgs_then_formattedCorrectly() {
     final Writer writer = javaWriter().tab(1).print("Format %s and %s!", "this", "that");
-    assertEquals("  Format this and that!", writer.asString());
+    assertThat(writer.asString()).isEqualTo("  Format this and that!");
   }
 
   @Test
@@ -26,19 +26,20 @@ class WriterTest {
             .print(" And put")
             .print(" everything on the same")
             .print(" line.");
-    assertEquals("Format this and that! And put everything on the same line.", writer.asString());
+    assertThat(writer.asString())
+        .isEqualTo("Format this and that! And put everything on the same line.");
   }
 
   @Test
   void println_when_calledTwoTimes_then_twoLinesCreated() {
     final Writer writer = javaWriter().println("Line number %d", 1).println("Line number %d", 2);
-    assertEquals("Line number 1\nLine number 2", writer.asString());
+    assertThat(writer.asString()).isEqualTo("Line number 1\nLine number 2");
   }
 
   @Test
   void tabAndPrintln_when_tabCalledBeforePrintLn_then_tabResettedAfterPrintLnCalled() {
     final Writer writer = javaWriter().tab(2).println("First line").println("Second line");
-    assertEquals("    First line\n" + "Second line", writer.asString());
+    assertThat(writer.asString()).isEqualTo("    First line\n" + "Second line");
   }
 
   @Test
@@ -52,14 +53,14 @@ class WriterTest {
             .println("Third line")
             .ref("Ref C")
             .ref("Ref A");
-    assertEquals(
-        "First line\n"
-            + "import Ref A;\n"
-            + "import Ref B;\n"
-            + "import Ref C;\n"
-            + "Second line\n"
-            + "Third line",
-        writer.asString());
+    assertThat(writer.asString())
+        .isEqualTo(
+            "First line\n"
+                + "import Ref A;\n"
+                + "import Ref B;\n"
+                + "import Ref C;\n"
+                + "Second line\n"
+                + "Third line");
   }
 
   @Test
@@ -74,13 +75,13 @@ class WriterTest {
             .print("Line after writer A")
             .append(writerB)
             .println("Line after writer B");
-    assertEquals(
-        "First line of main writer\n"
-            + "Something with a newline\n"
-            + "Line after writer A\n"
-            + "Something without a newline\n"
-            + "Line after writer B",
-        writer.asString());
+    assertThat(writer.asString())
+        .isEqualTo(
+            "First line of main writer\n"
+                + "Something with a newline\n"
+                + "Line after writer A\n"
+                + "Something without a newline\n"
+                + "Line after writer B");
   }
 
   @Test
@@ -92,8 +93,8 @@ class WriterTest {
             .println("First line of main writer")
             .append(2, writerA)
             .println("Some other line");
-    assertEquals(
-        "First line of main writer\n" + "    Content writer A\nSome other line", writer.asString());
+    assertThat(writer.asString())
+        .isEqualTo("First line of main writer\n" + "    Content writer A\nSome other line");
   }
 
   @Test
@@ -107,13 +108,13 @@ class WriterTest {
             .append(writerA)
             .println("Line after writer A")
             .ref("Main writer ref");
-    assertEquals(
-        "First line of main writer\n"
-            + "import Main writer ref;\n"
-            + "import Writer A ref;\n"
-            + "Something of writer A\n"
-            + "Line after writer A",
-        writer.asString());
+    assertThat(writer.asString())
+        .isEqualTo(
+            "First line of main writer\n"
+                + "import Main writer ref;\n"
+                + "import Writer A ref;\n"
+                + "Something of writer A\n"
+                + "Line after writer A");
   }
 
   @Test
@@ -128,7 +129,7 @@ class WriterTest {
             .println("Third line")
             .asString();
 
-    assertEquals("  First line\n" + "\n" + "  Third line", output);
+    assertThat(output).isEqualTo("  First line\n" + "\n" + "  Third line");
   }
 
   @Test
@@ -136,7 +137,7 @@ class WriterTest {
     final String output =
         javaWriter().printRefs().ref("java.lang.Integer").ref("java.util.Optional").asString();
 
-    assertEquals("import java.util.Optional;", output);
+    assertThat(output).isEqualTo("import java.util.Optional;");
   }
 
   @Test
@@ -148,7 +149,7 @@ class WriterTest {
             .printSingleBlankLine()
             .println("HELLO")
             .asString();
-    assertEquals("hello\n\nHELLO", output);
+    assertThat(output).isEqualTo("hello\n\nHELLO");
   }
 
   @Test
@@ -156,7 +157,7 @@ class WriterTest {
     final String output =
         javaWriter().println("Hello").println().println().println("World").asString();
 
-    assertEquals("Hello\n" + "\n" + "World", output);
+    assertThat(output).isEqualTo("Hello\n" + "\n" + "World");
   }
 
   @Test
@@ -169,7 +170,7 @@ class WriterTest {
             .println("World")
             .asString();
 
-    assertEquals("Hello\n" + "\n" + "\n" + "World", output);
+    assertThat(output).isEqualTo("Hello\n" + "\n" + "\n" + "World");
   }
 
   @Test
@@ -178,7 +179,7 @@ class WriterTest {
     final String output =
         javaWriter().println("Hello").println().printRefs().println().println("World").asString();
 
-    assertEquals("Hello\n" + "\n" + "World", output);
+    assertThat(output).isEqualTo("Hello\n" + "\n" + "World");
   }
 
   @Test
@@ -194,7 +195,7 @@ class WriterTest {
             .ref("ref-123")
             .asString();
 
-    assertEquals("Hello\n" + "\n" + "import ref-123;\n" + "\n" + "World", output);
+    assertThat(output).isEqualTo("Hello\n" + "\n" + "import ref-123;\n" + "\n" + "World");
   }
 
   @Test
@@ -209,6 +210,6 @@ class WriterTest {
             .println("!")
             .asString();
 
-    assertEquals("Hello\n\nWorld!", output);
+    assertThat(output).isEqualTo("Hello\n\nWorld!");
   }
 }
