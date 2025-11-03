@@ -1,55 +1,43 @@
 plugins {
-    id 'maven-publish'
-    id 'signing'
     id 'code-generator.java'
+    id 'com.vanniktech.maven.publish'
 }
 
-java {
-    withJavadocJar()
-    withSourcesJar()
-}
+mavenPublishing {
+    coordinates('io.github.muehmar', 'code-generator' + project.name.replace('core', ''), project.version.toString())
 
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            artifactId = 'code-generator' + project.name.replace('core', '')
-            from components.java
-            pom {
-                name = 'Code Generator'
-                description = 'Composable generator to generate source code'
-                url = 'https://github.com/muehmar/code-generator'
-                licenses {
-                    license {
-                        name = 'MIT License'
-                        url = 'https://github.com/muehmar/code-generator/blob/main/LICENSE'
-                    }
-                }
-                developers {
-                    developer {
-                        id = 'muehmar'
-                        name = 'Martin Mühlemann'
-                        email = 'poelsi@gmail.com'
-                    }
-                }
-                scm {
-                    connection = 'scm:git:git://github.com/muehmar/code-generator.git'
-                    developerConnection = 'scm:git:ssh://github.com/muehmar/code-generator.git'
-                    url = 'https://github.com/muehmar/code-generator.git'
-                }
+    pom {
+        name = 'Code Generator'
+        description = 'Composable generator to generate source code'
+        url = 'https://github.com/muehmar/code-generator'
+        licenses {
+            license {
+                name = 'MIT License'
+                url = 'https://github.com/muehmar/code-generator/blob/main/LICENSE'
             }
         }
-    }
-    repositories {
-        maven {
-            name = 'ossrh'
-            credentials(PasswordCredentials)
-            def releasesRepoUrl = 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
-            def snapshotsRepoUrl = 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
-            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+        developers {
+            developer {
+                id = 'muehmar'
+                name = 'Martin Mühlemann'
+                email = 'poelsi@gmail.com'
+            }
+        }
+        scm {
+            connection = 'scm:git:git://github.com/muehmar/code-generator.git'
+            developerConnection = 'scm:git:ssh://github.com/muehmar/code-generator.git'
+            url = 'https://github.com/muehmar/code-generator.git'
         }
     }
+
+    publishToMavenCentral(com.vanniktech.maven.publish.SonatypeHost.CENTRAL_PORTAL, true)
+    signAllPublications()
 }
 
-signing {
-    sign publishing.publications.mavenJava
+tasks.named('publishToMavenCentral').configure {
+    doFirst {
+        if (version.toString().endsWith('-SNAPSHOT')) {
+            throw new GradleException("SNAPSHOT publishing is not supported. Central Portal only accepts release versions.")
+        }
+    }
 }
