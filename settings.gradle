@@ -19,7 +19,7 @@ dependencyResolutionManagement {
 
             library('lombok', 'org.projectlombok:lombok:1.18.24')
 
-            version('pojoBuilder', '1.0.0')
+            version('pojoBuilder', '2.0.0')
             library('pojoBuilder', 'io.github.muehmar', 'pojo-builder').versionRef('pojoBuilder')
             library('pojoBuilder-annotations', 'io.github.muehmar', 'pojo-builder-annotations').versionRef('pojoBuilder')
         }
