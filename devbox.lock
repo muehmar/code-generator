@@ -1,0 +1,45 @@
+{
+  "lockfile_version": "1",
+  "packages": {
+    "github:NixOS/nixpkgs/nixpkgs-unstable": {
+      "last_modified": "2025-10-31T03:13:32Z",
+      "resolved": "github:NixOS/nixpkgs/a7fc11be66bdfb5cdde611ee5ce381c183da8386?lastModified=1761880412&narHash=sha256-QoJjGd4NstnyOG4mm4KXF%2BweBzA2AH%2F7gn1Pmpfcb0A%3D"
+    },
+    "jdk@17": {
+      "last_modified": "2025-10-07T08:41:47Z",
+      "resolved": "github:NixOS/nixpkgs/bce5fe2bb998488d8e7e7856315f90496723793c#jdk17",
+      "source": "devbox-search",
+      "version": "17.0.16+8",
+      "systems": {
+        "aarch64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/d74hi7qs48nzvvcf868c3ph61wqmyqzn-openjdk-17.0.16+8",
+              "default": true
+            },
+            {
+              "name": "debug",
+              "path": "/nix/store/53j83lv2gpqwnh1jby4wvzn75aq4ic5h-openjdk-17.0.16+8-debug"
+            }
+          ],
+          "store_path": "/nix/store/d74hi7qs48nzvvcf868c3ph61wqmyqzn-openjdk-17.0.16+8"
+        },
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/4m47rbnk2wz80yvwzkj5a43j32jiv8l6-openjdk-17.0.16+8",
+              "default": true
+            },
+            {
+              "name": "debug",
+              "path": "/nix/store/spkgmp9a3rrr6v35wn2z9zijg9qqsxvc-openjdk-17.0.16+8-debug"
+            }
+          ],
+          "store_path": "/nix/store/4m47rbnk2wz80yvwzkj5a43j32jiv8l6-openjdk-17.0.16+8"
+        }
+      }
+    }
+  }
+}
